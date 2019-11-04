@@ -1,7 +1,7 @@
 {
   "name": "stencil-context",
   "version": "0.0.1",
-  "description": "Stencil Component Starter",
+  "description": "Stencil Context",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "es2015": "dist/esm/index.mjs",
@@ -26,8 +26,5 @@
     "@stencil/sass": "^1.1.1",
     "typescript": "^3.6.4"
   },
-  "license": "MIT",
-  "dependencies": {
-    "stacktrace-js": "^2.0.1"
-  }
+  "license": "MIT"
 }
