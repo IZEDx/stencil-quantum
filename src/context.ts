@@ -2,7 +2,7 @@ import { Provider } from "./provider";
 import { HTMLStencilElement } from "@stencil/core/internal";
 
 class ContextError extends Error {}
-const $providers = Symbol("providers");
+const $providers = Symbol.for("stencil-quantum-providers");
 
 export function Provide(key?: string|symbol) 
 { 
@@ -49,8 +49,6 @@ export function Context(key?: string)
 
 function hookComponent(prototype: Object, willLoad: (obj: any) => void)
 {
-    console.log("hooking", prototype);
-
     const _componentWillLoad = prototype["componentWillLoad"] || nop;
 
     prototype["componentWillLoad"] = function(...args: any[]) {
