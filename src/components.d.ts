@@ -14,12 +14,12 @@ export namespace Components {
     'mapper': (val: any) => string;
     'name': string;
   }
+  interface CtxGreetComp {}
   interface CtxProvider {
     'name': string;
     'value': any;
   }
-  interface GreetComp {}
-  interface MyComponent {}
+  interface CtxTestComp {}
 }
 
 declare global {
@@ -31,28 +31,28 @@ declare global {
     new (): HTMLCtxConsumerElement;
   };
 
+  interface HTMLCtxGreetCompElement extends Components.CtxGreetComp, HTMLStencilElement {}
+  var HTMLCtxGreetCompElement: {
+    prototype: HTMLCtxGreetCompElement;
+    new (): HTMLCtxGreetCompElement;
+  };
+
   interface HTMLCtxProviderElement extends Components.CtxProvider, HTMLStencilElement {}
   var HTMLCtxProviderElement: {
     prototype: HTMLCtxProviderElement;
     new (): HTMLCtxProviderElement;
   };
 
-  interface HTMLGreetCompElement extends Components.GreetComp, HTMLStencilElement {}
-  var HTMLGreetCompElement: {
-    prototype: HTMLGreetCompElement;
-    new (): HTMLGreetCompElement;
-  };
-
-  interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {}
-  var HTMLMyComponentElement: {
-    prototype: HTMLMyComponentElement;
-    new (): HTMLMyComponentElement;
+  interface HTMLCtxTestCompElement extends Components.CtxTestComp, HTMLStencilElement {}
+  var HTMLCtxTestCompElement: {
+    prototype: HTMLCtxTestCompElement;
+    new (): HTMLCtxTestCompElement;
   };
   interface HTMLElementTagNameMap {
     'ctx-consumer': HTMLCtxConsumerElement;
+    'ctx-greet-comp': HTMLCtxGreetCompElement;
     'ctx-provider': HTMLCtxProviderElement;
-    'greet-comp': HTMLGreetCompElement;
-    'my-component': HTMLMyComponentElement;
+    'ctx-test-comp': HTMLCtxTestCompElement;
   }
 }
 
@@ -61,18 +61,18 @@ declare namespace LocalJSX {
     'mapper'?: (val: any) => string;
     'name'?: string;
   }
+  interface CtxGreetComp {}
   interface CtxProvider {
     'name'?: string;
     'value'?: any;
   }
-  interface GreetComp {}
-  interface MyComponent {}
+  interface CtxTestComp {}
 
   interface IntrinsicElements {
     'ctx-consumer': CtxConsumer;
+    'ctx-greet-comp': CtxGreetComp;
     'ctx-provider': CtxProvider;
-    'greet-comp': GreetComp;
-    'my-component': MyComponent;
+    'ctx-test-comp': CtxTestComp;
   }
 }
 
@@ -83,9 +83,9 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'ctx-consumer': LocalJSX.CtxConsumer & JSXBase.HTMLAttributes<HTMLCtxConsumerElement>;
+      'ctx-greet-comp': LocalJSX.CtxGreetComp & JSXBase.HTMLAttributes<HTMLCtxGreetCompElement>;
       'ctx-provider': LocalJSX.CtxProvider & JSXBase.HTMLAttributes<HTMLCtxProviderElement>;
-      'greet-comp': LocalJSX.GreetComp & JSXBase.HTMLAttributes<HTMLGreetCompElement>;
-      'my-component': LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+      'ctx-test-comp': LocalJSX.CtxTestComp & JSXBase.HTMLAttributes<HTMLCtxTestCompElement>;
     }
   }
 }

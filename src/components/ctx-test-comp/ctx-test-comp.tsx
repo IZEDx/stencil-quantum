@@ -2,12 +2,11 @@ import { Component, h, State, Element } from '@stencil/core';
 import { Provide } from '../../context';
 
 @Component({
-	tag: 'my-component',
-	styleUrl: 'my-component.css'
+	tag: 'ctx-test-comp',
 })
-export class MyComponent 
+export class CtxTestComp 
 {
-	@Element() el: HTMLMyComponentElement;
+	@Element() el: HTMLCtxTestCompElement;
 
 	@Provide("greeting") defaultGreeting = "Welt";
 	@State() hansTimer = 0;
@@ -23,14 +22,14 @@ export class MyComponent
 	render() {
 		return <div>
 			<h1>My Component</h1>
-			<greet-comp></greet-comp>
+			<ctx-greet-comp></ctx-greet-comp>
 			<br />
 			<ctx-provider name="greeting" value={"Hans " + this.hansTimer}>
-				<greet-comp></greet-comp>
+				<ctx-greet-comp></ctx-greet-comp>
 			</ctx-provider>
 			<br />
 			<ctx-provider name="greeting" value={"Dieter " + this.dieterTimer}>
-				<greet-comp></greet-comp>
+				<ctx-greet-comp></ctx-greet-comp>
 			</ctx-provider>
 		</div>
 	}

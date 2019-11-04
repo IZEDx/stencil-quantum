@@ -1,9 +1,9 @@
 import { Component, h } from '@stencil/core';
 
 @Component({
-    tag: 'greet-comp'
+    tag: 'ctx-greet-comp'
 })
-export class GreetComp {
+export class CtxGreetComp {
     render() {
         return <div>
             Hallo <ctx-consumer name="greeting"></ctx-consumer>
