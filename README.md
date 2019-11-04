@@ -34,10 +34,10 @@ export class MyComponent
 	@Provide() greeting = 'World';
 
 	render() {
-		return <div>
+        return <div>
             <h1>My Component</h1>
             <greet-comp></greet-comp>
-		</div>
+        </div>
 	}
 }
 ```
