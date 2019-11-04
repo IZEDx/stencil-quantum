@@ -27,5 +27,7 @@
     "typescript": "^3.6.4"
   },
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "stacktrace-js": "^2.0.1"
+  }
 }

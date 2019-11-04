@@ -6,50 +6,26 @@ type LifecycleMethod = (...args: any[]) => MaybePromise<void>;
 
 class ContextError extends Error {}
 
-const nop = () => {};
 interface ContextFrame {
     obj: Object;
     providers: Provider<any>[];
 }
 let contextStack = [] as ContextFrame[];
-const pushFrame = (frame: ContextFrame) => { contextStack = [...contextStack, frame]; }
-const popFrame = () => { contextStack = contextStack.length === 0 ? [] : contextStack.slice(0, contextStack.length - 1); }
-const pushProvider = (frame: ContextFrame, provider: Provider<any>) => { frame.providers = [...frame.providers, provider]; }
-const currentFrame = () => contextStack.length === 0 ? undefined : contextStack[contextStack.length - 1];
 
-export function Provide(key?: string) 
+export function Provide(key?: string|symbol) 
 { 
-    return function (target: Object, propertyName: string)
+    return function (prototype: Object, propertyName: string)
     {
-        console.log(target, propertyName);
+        console.log(prototype, propertyName);
 
         key = key || propertyName;
-        const provider = new Provider(key, target[propertyName]);
+        const provider = new Provider(key, prototype[propertyName]);
 
-        hookComponent(target, 
-            obj => {
-                console.log("Provider WillLoad", obj);
-                let frame = currentFrame();
-                if (!frame || frame.obj !== obj) {
-                    frame = {obj, providers: []};
-                    pushFrame(frame);
-                }
-                pushProvider(frame, provider);
-                console.log("Push Provider", key, provider);
-            }, 
-            obj => {
-                console.log("Provider DidLoad", obj);
-                let frame = currentFrame();
-                if (frame && frame.obj === obj) {
-                    popFrame();
-                    console.log("Pop Frame");
-                }
-            }
-        );
+        hookComponent(prototype, obj => pushProvider(provider, obj), popFrame);
 
-        if (delete target[propertyName]) 
+        if (delete prototype[propertyName]) 
         {
-            Object.defineProperty(target, propertyName, 
+            Object.defineProperty(prototype, propertyName, 
             {
                 get: provider.retrieve,
                 set: provider.provide,
@@ -62,30 +38,23 @@ export function Provide(key?: string)
 
 export function Context(key?: string) 
 { 
-    return function (target: Object, propertyName: string)
+    return function (prototype: {el: HTMLElement}, propertyName: string)
     {
-        console.log(target, propertyName);
+        console.log(prototype, propertyName);
 
         key = key || propertyName;
         let provider: Provider<any>;
 
-        hookComponent(target, obj => {
+        hookComponent(prototype, obj => {
             console.log("Context WillLoad", obj);
             provider = findProvider(key);
-            provider.listen((val) => {
-                const el = obj["el"];
-                if (el instanceof Object && typeof el.forceUpdate === "function") {
-                    el.forceUpdate();
-                } else {
-                    console.warn("El not found, unable to force update, for key", key, "on", obj);
-                }
-            });
+            provider.listen(() => forceUpdate(obj, true));
             console.log("Found provider", key, provider);
         });
 
-        if (delete target[propertyName]) 
+        if (delete prototype[propertyName]) 
         {
-            Object.defineProperty(target, propertyName, 
+            Object.defineProperty(prototype, propertyName, 
             {
                 get: () => provider && provider.retrieve(),
                 enumerable: true,
@@ -95,7 +64,29 @@ export function Context(key?: string)
     } 
 }
 
-function findProvider(key: string)
+/**
+ * Only run from componentWillLoad()
+ * @param _this 
+ * @param key 
+ * @param value 
+ */
+export function createProvider<T>(_this: Object, key: string|symbol, value: T): Provider<T>
+{
+    const provider = new Provider(key, value);
+
+    pushProvider(_this, provider);
+    hookComponent(_this.constructor.prototype, nop, popFrame);
+
+    return provider;
+}
+
+/**
+ * Only run from componentWillLoad()
+ * @param obj 
+ * @param key 
+ * @param value 
+ */
+export function findProvider(key: string)
 {
     for (let i = contextStack.length - 1; i >= 0; i--)
     {
@@ -113,20 +104,70 @@ function findProvider(key: string)
     throw new ContextError(`No provider with key "${key}" found in context!`);
 }
 
-
-function hookComponent(target: Object, willLoad: (obj: any) => void, didLoad: (obj: any) => void = nop)
+function forceUpdate(_this: any, showWarn = false)
 {
-    const componentWillLoad: LifecycleMethod = target["componentWillLoad"] || nop;
-    const componentDidLoad: LifecycleMethod = target["componentDidLoad"] || nop;
-
-    target["componentWillLoad"] = function (...args: any[]) {
-        willLoad(this);
-        return componentWillLoad.apply(this, args);
-    }
-
-    target["componentDidLoad"] = (...args: any[]) => {
-        didLoad(this);
-        return componentDidLoad.apply(this, args);
+    const el = _this && _this["el"];
+    if (el instanceof Object && typeof el.forceUpdate === "function") {
+        el.forceUpdate();
+        return true;
+    } else {
+        if (showWarn) console.warn("El not found, unable to force update", _this);
+        return false;
     }
 }
 
+
+function hookComponent(prototype: Object, willLoad: (obj: any) => void, didLoad: (obj: any) => void = nop)
+{
+    console.log("hooking", prototype);
+
+    const _componentWillLoad: LifecycleMethod = prototype["componentWillLoad"] || nop;
+    const _componentDidLoad: LifecycleMethod = prototype["componentDidLoad"] || nop;
+
+    prototype["componentWillLoad"] = function(...args: any[]) {
+        console.log("Will load", this);
+        willLoad(this);
+        return _componentWillLoad.apply(this, args);
+    }
+
+    prototype["componentDidLoad"] = function(...args: any[]) {
+        console.log("Did load", this);
+        didLoad(this);
+        return _componentDidLoad.apply(this, args);
+    }
+}
+
+
+const currentFrame = () => contextStack.length === 0 ? undefined : contextStack[contextStack.length - 1];
+
+const pushFrame = (obj: Object) => 
+{ 
+    let frame = currentFrame();
+    if (!frame || frame.obj !== obj) {
+        frame = {obj, providers: []};
+        contextStack = [...contextStack, frame]; 
+        console.log("Push Frame", obj);
+    }
+    return frame;
+}
+
+const popFrame = (obj: Object) => 
+{ 
+    let frame = currentFrame();
+    if (frame && frame.obj === obj) {
+        contextStack = contextStack.length === 0 ? [] : contextStack.slice(0, contextStack.length - 1); 
+        console.log("Pop Frame", obj);
+        return frame;
+    }
+    return undefined;
+}
+
+const pushProvider = (obj: Object, provider: Provider<any>) => 
+{ 
+    let frame = pushFrame(obj);
+    frame.providers = [...frame.providers, provider]; 
+    provider.listen(() => forceUpdate(obj, false));
+    console.log("Push Provider", provider, obj);
+}
+
+const nop = () => {};
