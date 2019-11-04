@@ -1,7 +1,7 @@
 {
-  "name": "stencil-context",
+  "name": "stencil-quantum",
   "version": "0.0.1",
-  "description": "Stencil Context",
+  "description": "Stencil Quantum",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "es2015": "dist/esm/index.mjs",
@@ -9,7 +9,7 @@
   "types": "dist/types/index.d.ts",
   "collection": "dist/collection/collection-manifest.json",
   "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/stencil-context/stencil-context.js",
+  "unpkg": "dist/stencil-quantum/stencil-quantum.js",
   "files": [
     "dist/",
     "loader/"
