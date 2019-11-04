@@ -1,6 +1,5 @@
 import { Component, Element, Prop, State } from '@stencil/core';
 import { findProvider } from '../../context';
-import StackTrace from "stacktrace-js";
 
 @Component({
     tag: 'ctx-consumer'
@@ -8,23 +7,15 @@ import StackTrace from "stacktrace-js";
 export class CtxConsumer {
 
     @Element() el: HTMLElement;
-    @Prop() name: string;
+    @Prop({reflectToAttr: true}) name: string;
     @Prop() mapper = (val: any) => `${val}`;
     @State() value = "";
 
-    async componentWillLoad()
+    componentWillLoad()
     {
-        console.log("------------- CONSUMER START", this.name, this.value);
-        console.log(await StackTrace.get());
-        const provider = findProvider(this.name);
+        const provider = findProvider(this.el, this.name);
         this.updateVal(provider.retrieve());
         provider.listen(this.updateVal.bind(this));
-    }
-
-    async componentDidLoad()
-    {
-        console.log("------------- CONSUMER END", this.name, this.value);
-        console.log(await StackTrace.get());
     }
 
     updateVal(val: any)

@@ -1,7 +1,6 @@
-import { Component, h, Prop, Watch } from '@stencil/core';
+import { Component, h, Prop, Watch, Element } from '@stencil/core';
 import { createProvider } from '../../context';
 import { Provider } from '../../provider';
-import StackTrace from "stacktrace-js";
 
 
 @Component({
@@ -9,22 +8,15 @@ import StackTrace from "stacktrace-js";
 })
 export class CtxProvider 
 {
+    @Element() el: HTMLElement;
     @Prop({reflectToAttr: true}) name: string;
-    @Prop({reflectToAttr: true}) value: any;
+    @Prop() value: any;
 
     provider!: Provider<any>;
 
-    async componentWillLoad()
+    componentWillLoad()
     {
-        console.log("------------- PROVIDER START", this.name, this.value);
-        console.log(await StackTrace.get());
-        this.provider = createProvider(this, this.name, this.value);
-    }
-
-    async componentDidLoad()
-    {
-        console.log("------------- PROVIDER END", this.name, this.value);
-        console.log(await StackTrace.get());
+        this.provider = createProvider(this.el, this.name, this.value);
     }
 
     @Watch("value")
