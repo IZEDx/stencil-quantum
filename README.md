@@ -25,20 +25,20 @@ import { Component, h, State, Element } from '@stencil/core';
 import { Provide } from 'stencil-context';
 
 @Component({
-	tag: 'my-component'
+    tag: 'my-component'
 })
 export class MyComponent 
 {
-	@Element() el: HTMLElement;
+    @Element() el: HTMLElement;
 
-	@Provide() greeting = 'World';
+    @Provide() greeting = 'World';
 
-	render() {
+    render() {
         return <div>
             <h1>My Component</h1>
             <greet-comp></greet-comp>
         </div>
-	}
+    }
 }
 ```
 
@@ -51,11 +51,11 @@ import { Context } from 'stencil-context';
 @Component({
     tag: 'greet-comp'
 })
-export class GreetComp {
-
+export class GreetComp 
+{
     @Element() el: HTMLElement;
 
-	@Context() greeting = 'Nobody';
+    @Context() greeting = 'Nobody';
 
     render() {
         return <div>
@@ -77,33 +77,33 @@ import { Component, h, State, Element } from '@stencil/core';
 import 'stencil-context';
 
 @Component({
-	tag: 'my-component',
+    tag: 'my-component',
 })
 export class MyComponent 
 {
-	@Element() el: HTMLElement;
+    @Element() el: HTMLElement;
 
-	@State() johnTimer = 0;
-	@State() kevinTimer = 0;
+    @State() johnTimer = 0;
+    @State() kevinTimer = 0;
 
-	componentWillLoad()
-	{
-		setInterval(() => this.johnTimer++, 1000);
-		setInterval(() => this.kevinTimer++, 2000);
-	}
+    componentWillLoad()
+    {
+        setInterval(() => this.johnTimer++, 1000);
+        setInterval(() => this.kevinTimer++, 2000);
+    }
 
-	render() {
-		return <div>
-			<h1>My Component</h1>
-			<ctx-provider name="greeting" value={"John " + this.johnTimer}>
-				<greet-comp></greet-comp>
-			</ctx-provider>
-			<br />
-			<ctx-provider name="greeting" value={"Kevin " + this.kevinTimer}>
-				<greet-comp></greet-comp>
-			</ctx-provider>
-		</div>
-	}
+    render() {
+        return <div>
+            <h1>My Component</h1>
+            <ctx-provider name="greeting" value={"John " + this.johnTimer}>
+                <greet-comp></greet-comp>
+            </ctx-provider>
+            <br />
+            <ctx-provider name="greeting" value={"Kevin " + this.kevinTimer}>
+                <greet-comp></greet-comp>
+            </ctx-provider>
+        </div>
+    }
 }
 ```
 
@@ -114,8 +114,8 @@ import { Component, h, Element } from '@stencil/core';
 @Component({
     tag: 'greet-comp'
 })
-export class GreetComp {
-
+export class GreetComp 
+{
     @Element() el: HTMLElement;
 
     render() {
