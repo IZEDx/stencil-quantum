@@ -7,7 +7,7 @@ import { Provide } from '../../context';
 })
 export class MyComponent 
 {
-	@Element() el: HTMLElement;
+	@Element() el: HTMLMyComponentElement;
 
 	@Provide("greeting") defaultGreeting = "Welt";
 	@State() hansTimer = 0;

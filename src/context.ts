@@ -1,11 +1,12 @@
 import { Provider } from "./provider";
+import { HTMLStencilElement } from "@stencil/core/internal";
 
 class ContextError extends Error {}
 const $providers = Symbol("providers");
 
 export function Provide(key?: string|symbol) 
 { 
-    return function (prototype: Object, propertyName: string)
+    return function (prototype: {el: HTMLStencilElement}, propertyName: string)
     {
         key = key || propertyName;
         const provider = new Provider(key, prototype[propertyName]);
@@ -27,7 +28,7 @@ export function Provide(key?: string|symbol)
 
 export function Context(key?: string) 
 { 
-    return function (prototype: {el: HTMLElement}, propertyName: string)
+    return function (prototype: {el: HTMLStencilElement}, propertyName: string)
     {
         key = key || propertyName;
         let provider: Provider<any>;
@@ -59,7 +60,7 @@ function hookComponent(prototype: Object, willLoad: (obj: any) => void)
     }
 }
 
-export function hookProvider<T>(el: HTMLElement, key: string): Provider<T>
+export function hookProvider<T>(el: HTMLStencilElement, key: string): Provider<T>
 {
     const provider = findProvider<T>(el, key);
     forceUpdate(el, provider);
@@ -88,7 +89,7 @@ export function findProvider<T>(el: HTMLElement, key: string): Provider<T>
     }
 }
 
-export function createProvider<T>(el: HTMLElement, key: string|symbol, value: T): Provider<T>
+export function createProvider<T>(el: HTMLStencilElement, key: string|symbol, value: T): Provider<T>
 {
     const provider = new Provider(key, value);
 
@@ -97,7 +98,7 @@ export function createProvider<T>(el: HTMLElement, key: string|symbol, value: T)
     return provider;
 }
 
-export function addProvider(el: HTMLElement, provider: Provider<any>)
+export function addProvider(el: HTMLStencilElement, provider: Provider<any>)
 { 
     if (!(el[$providers] instanceof Array)) {
         el[$providers] = [];
@@ -107,12 +108,12 @@ export function addProvider(el: HTMLElement, provider: Provider<any>)
     forceUpdate(el, provider);
 }
 
-export function forceUpdate(el: HTMLElement, provider: Provider<any>)
+export function forceUpdate(el: HTMLStencilElement, provider: Provider<any>)
 {
-    provider.listen(() => (<any>el).forceUpdate());
+    provider.listen(() => el.forceUpdate());
 }
 
-function getEl(_this: any): HTMLElement
+function getEl(_this: any): HTMLStencilElement
 {
     const el = _this && _this["el"];
     if (el instanceof Object && typeof el.forceUpdate === "function") {

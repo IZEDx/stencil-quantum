@@ -6,7 +6,7 @@ import { findProvider } from '../../context';
 })
 export class CtxConsumer {
 
-    @Element() el: HTMLElement;
+    @Element() el: HTMLCtxConsumerElement;
     @Prop({reflectToAttr: true}) name: string;
     @Prop() mapper = (val: any) => `${val}`;
     @State() value = "";

@@ -2,13 +2,12 @@ import { Component, h, Prop, Watch, Element } from '@stencil/core';
 import { createProvider } from '../../context';
 import { Provider } from '../../provider';
 
-
 @Component({
     tag: 'ctx-provider'
 })
 export class CtxProvider 
 {
-    @Element() el: HTMLElement;
+    @Element() el: HTMLCtxProviderElement;
     @Prop({reflectToAttr: true}) name: string;
     @Prop() value: any;
 
