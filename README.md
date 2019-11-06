@@ -21,17 +21,17 @@ In order to use these decorators, your Stencil component also needs to have a pr
 #### my-component.tsx
 
 ```tsx
-import { Component, h, State, Element } from '@stencil/core';
-import { Provide } from 'stencil-context';
+import { Component, h, State, Element } from "@stencil/core";
+import { Provide } from "stencil-quantum";
 
 @Component({
-    tag: 'my-component'
+    tag: "my-component"
 })
 export class MyComponent 
 {
     @Element() el: HTMLElement;
 
-    @Provide() greeting = 'World';
+    @Provide() greeting = "World";
 
     render() {
         return <div>
@@ -45,17 +45,17 @@ export class MyComponent
 #### greet-comp.tsx
 
 ```tsx
-import { Component, h, Element } from '@stencil/core';
-import { Context } from 'stencil-context';
+import { Component, h, Element } from "@stencil/core";
+import { Context } from "stencil-quantum";
 
 @Component({
-    tag: 'greet-comp'
+    tag: "greet-comp"
 })
 export class GreetComp 
 {
     @Element() el: HTMLElement;
 
-    @Context() greeting = 'Nobody';
+    @Context() greeting = "Nobody";
 
     render() {
         return <div>
@@ -73,11 +73,11 @@ Additionally Stencil Quantum comes with two components to provide and consume da
 
 #### my-component.tsx
 ```tsx
-import { Component, h, State, Element } from '@stencil/core';
-import 'stencil-context';
+import { Component, h, State, Element } from "@stencil/core";
+import "stencil-quantum";
 
 @Component({
-    tag: 'my-component',
+    tag: "my-component",
 })
 export class MyComponent 
 {
@@ -109,10 +109,11 @@ export class MyComponent
 
 #### greet-comp.tsx
 ```tsx
-import { Component, h, Element } from '@stencil/core';
+import { Component, h, Element } from "@stencil/core";
+import "stencil-quantum";
 
 @Component({
-    tag: 'greet-comp'
+    tag: "greet-comp"
 })
 export class GreetComp 
 {
