@@ -7,10 +7,10 @@
 
 ## Properties
 
-| Property | Attribute | Description | Type                   | Default                  |
-| -------- | --------- | ----------- | ---------------------- | ------------------------ |
-| `mapper` | --        |             | `(val: any) => string` | `(val: any) => `${val}`` |
-| `name`   | `name`    |             | `string`               | `undefined`              |
+| Property            | Attribute | Description | Type                   | Default                  |
+| ------------------- | --------- | ----------- | ---------------------- | ------------------------ |
+| `mapper`            | --        |             | `(val: any) => string` | `(val: any) => `${val}`` |
+| `name` _(required)_ | `name`    |             | `string`               | `undefined`              |
 
 
 ## Dependencies
