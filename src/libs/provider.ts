@@ -5,7 +5,7 @@ export class Provider<T>
 {
     listeners = [] as ProvideCallback<T>[];
 
-    constructor(public readonly key, private value: T)
+    constructor(public readonly key: string|symbol, private value: T)
     {
         this.retrieve = this.retrieve.bind(this);
         this.provide = this.provide.bind(this);
