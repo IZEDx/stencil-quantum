@@ -2,7 +2,7 @@
 
 # Stencil Quantum
 
-Stencil Quantum serves a similar purpose as [stencil-state-tunnel](https://github.com/ionic-team/stencil-state-tunnel) or [stencil-context](https://www.npmjs.com/package/stencil-context), althought with less overhead.
+Stencil Quantum serves a similar purpose as [stencil-state-tunnel](https://github.com/ionic-team/stencil-state-tunnel) or [stencil-context](https://www.npmjs.com/package/stencil-context), although with less overhead.
 It provides a way to inexplicitly pass props down the DOM-tree. 
 This context state can be accessed in three different ways, via decorators, components or manually.
 
@@ -15,7 +15,7 @@ Both decorators take an optional "key" argument, if none is passed, the property
 
 Both decorators are reactive in a stencil sense, meaning they trigger a re-render if their values change. If you set the value on a providing component, then all child components that use it will be re-rendered.
 
-In order to use these decorators, your Stencil component also needs to have their HTMLElement defined as "el", using ```@Element()```, as Stencil Quantum needs to access the DOM to determine the scopes.
+In order to use these decorators, your Stencil component also needs to have their HTMLElement defined as "el", using ```@Element()```, since Stencil Quantum needs to access the DOM to determine the scopes.
 
 ### Example
 
