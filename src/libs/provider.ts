@@ -23,6 +23,11 @@ export class Provider<T>
         this.listeners.forEach(cb => cb(value));
     }
 
+    update(fn: (v: T) => T)
+    {
+        this.provide(fn(this.retrieve()));
+    }
+
     listen(cb: ProvideCallback<T>)
     {
         this.listeners = [...this.listeners, cb];
