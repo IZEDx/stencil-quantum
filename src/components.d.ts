@@ -59,11 +59,11 @@ declare global {
 declare namespace LocalJSX {
   interface CtxConsumer {
     'mapper'?: (val: any) => string;
-    'name'?: string;
+    'name': string;
   }
   interface CtxGreetComp {}
   interface CtxProvider {
-    'name'?: string;
+    'name': string;
     'value'?: any;
   }
   interface CtxTestComp {}

@@ -1,13 +1,14 @@
 import { Component, Element, Prop, State } from '@stencil/core';
-import { findProvider } from '../../context';
+import { findProvider } from '../../libs/context';
 
 @Component({
     tag: 'ctx-consumer'
 })
 export class CtxConsumer {
 
-    @Element() el: HTMLCtxConsumerElement;
-    @Prop({reflectToAttr: true}) name: string;
+    @Element() el!: HTMLCtxConsumerElement;
+    
+    @Prop({reflectToAttr: true}) name!: string;
     @Prop() mapper = (val: any) => `${val}`;
     @State() value = "";
 

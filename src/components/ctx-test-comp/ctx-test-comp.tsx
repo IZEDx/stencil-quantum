@@ -1,12 +1,12 @@
 import { Component, h, State, Element } from '@stencil/core';
-import { Provide } from '../../context';
+import { Provide } from '../../libs/context';
 
 @Component({
 	tag: 'ctx-test-comp',
 })
 export class CtxTestComp 
 {
-	@Element() el: HTMLCtxTestCompElement;
+	@Element() el!: HTMLCtxTestCompElement;
 
 	@Provide("greeting") defaultGreeting = "Welt";
 	@State() hansTimer = 0;
