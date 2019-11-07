@@ -3,7 +3,7 @@
 # Stencil Quantum
 
 Stencil Quantum provides a way to inexplicitly pass props down the DOM-tree. 
-The context can be accessed in three different ways, although this will focus on the first two, considering the third is the manual way.
+The context can be accessed in three different ways, via decorators, components or manually.
 
 ## Decorators
 
@@ -21,7 +21,7 @@ In order to use these decorators, your Stencil component also needs to have a pr
 #### my-component.tsx
 
 ```tsx
-import { Component, h, State, Element } from "@stencil/core";
+import { Component, h, Element } from "@stencil/core";
 import { Provide } from "stencil-quantum";
 
 @Component({
@@ -29,7 +29,7 @@ import { Provide } from "stencil-quantum";
 })
 export class MyComponent 
 {
-    @Element() el: HTMLElement;
+    @Element() el: HTMLStencilElement;
 
     @Provide() greeting = "World";
 
@@ -53,7 +53,7 @@ import { Context } from "stencil-quantum";
 })
 export class GreetComp 
 {
-    @Element() el: HTMLElement;
+    @Element() el: HTMLStencilElement;
 
     @Context() greeting = "Nobody";
 
@@ -73,7 +73,7 @@ Additionally Stencil Quantum comes with two components to provide and consume da
 
 #### my-component.tsx
 ```tsx
-import { Component, h, State, Element } from "@stencil/core";
+import { Component, h, State } from "@stencil/core";
 import "stencil-quantum";
 
 @Component({
@@ -81,8 +81,6 @@ import "stencil-quantum";
 })
 export class MyComponent 
 {
-    @Element() el: HTMLElement;
-
     @State() johnTimer = 0;
     @State() kevinTimer = 0;
 
@@ -109,7 +107,7 @@ export class MyComponent
 
 #### greet-comp.tsx
 ```tsx
-import { Component, h, Element } from "@stencil/core";
+import { Component, h } from "@stencil/core";
 import "stencil-quantum";
 
 @Component({
@@ -117,11 +115,73 @@ import "stencil-quantum";
 })
 export class GreetComp 
 {
-    @Element() el: HTMLElement;
-
     render() {
         return <div>
             Hello <ctx-consumer name="greeting"></ctx-consumer>
+        </div>;
+    }
+}
+```
+
+## Manual
+
+### Example
+
+#### my-component.tsx
+```tsx
+import { Component, h, Element } from "@stencil/core";
+import "stencil-quantum";
+
+@Component({
+    tag: "my-component",
+})
+export class MyComponent 
+{
+    @Element() el: HTMLStencilElement;
+
+    provider!: Provider<number>;
+
+    componentWillLoad()
+    {
+        this.provider = createProvider(this.el, "greeting", 0);
+        
+        // These two are equivalent
+        setInterval(() => this.provider.update(v => v + 1), 1000); 
+        // setInterval(() => this.provider.provide(this.provider.retrieve() + 1), 1000);
+    }
+
+    render() {
+        return <div>
+            <h1>My Component</h1>
+            <greet-comp></greet-comp>
+        </div>
+    }
+}
+```
+
+#### greet-comp.tsx
+```tsx
+import { Component, h, Element, State } from "@stencil/core";
+import "stencil-quantum";
+
+@Component({
+    tag: "greet-comp"
+})
+export class GreetComp 
+{
+    @Element() el!: HTMLGreetCompElement;
+    @State() greeting = "";
+
+    componentWillLoad()
+    {
+        const provider = findProvider(this.el, "greeting");
+        this.greeting = provider.retrieve();
+        provider.listen(v => this.greeting = v);
+    }
+
+    render() {
+        return <div>
+            Hello {this.greeting}
         </div>;
     }
 }
