@@ -10,12 +10,11 @@ export class CtxConsumer {
     
     @Prop({reflectToAttr: true}) name!: string;
     @Prop() mapper = (val: any) => `${val}`;
-    @State() value = "";
+    @State() value!: string;
 
     componentWillLoad()
     {
         const provider = findProvider(this.el, this.name);
-        this.updateVal(provider.retrieve());
         provider.listen(this.updateVal.bind(this));
     }
 

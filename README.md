@@ -2,6 +2,7 @@
 
 # Stencil Quantum
 
+Stencil Quantum serves a similar purpose as [stencil-state-tunnel](https://github.com/ionic-team/stencil-state-tunnel) or [stencil-context](https://www.npmjs.com/package/stencil-context)
 Stencil Quantum provides a way to inexplicitly pass props down the DOM-tree. 
 The context can be accessed in three different ways, via decorators, components or manually.
 
@@ -55,7 +56,7 @@ export class GreetComp
 {
     @Element() el: HTMLStencilElement;
 
-    @Context() greeting = "Nobody";
+    @Context() greeting!: string;
 
     render() {
         return <div>
@@ -130,7 +131,7 @@ export class GreetComp
 #### my-component.tsx
 ```tsx
 import { Component, h, Element } from "@stencil/core";
-import "stencil-quantum";
+import { createProvider } from "stencil-quantum";
 
 @Component({
     tag: "my-component",
@@ -139,15 +140,13 @@ export class MyComponent
 {
     @Element() el: HTMLStencilElement;
 
-    provider!: Provider<number>;
-
     componentWillLoad()
     {
-        this.provider = createProvider(this.el, "greeting", 0);
+        const provider = createProvider(this.el, "greeting", 0);
         
         // These two are equivalent
-        setInterval(() => this.provider.update(v => v + 1), 1000); 
-        // setInterval(() => this.provider.provide(this.provider.retrieve() + 1), 1000);
+        setInterval(() => provider.update(v => v + 1), 1000); 
+        // setInterval(() => provider.provide(provider.retrieve() + 1), 1000);
     }
 
     render() {
@@ -162,7 +161,7 @@ export class MyComponent
 #### greet-comp.tsx
 ```tsx
 import { Component, h, Element, State } from "@stencil/core";
-import "stencil-quantum";
+import { findProvider } from "stencil-quantum";
 
 @Component({
     tag: "greet-comp"
@@ -170,12 +169,11 @@ import "stencil-quantum";
 export class GreetComp 
 {
     @Element() el!: HTMLGreetCompElement;
-    @State() greeting = "";
+    @State() greeting!: string;
 
     componentWillLoad()
     {
         const provider = findProvider(this.el, "greeting");
-        this.greeting = provider.retrieve();
         provider.listen(v => this.greeting = v);
     }
 

@@ -31,6 +31,7 @@ export class Provider<T>
     listen(cb: ProvideCallback<T>)
     {
         this.listeners = [...this.listeners, cb];
+        cb(this.value);
         return () => {
             this.listeners = this.listeners.filter(_cb => _cb !== cb);
         }
