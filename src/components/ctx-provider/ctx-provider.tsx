@@ -1,5 +1,4 @@
 import { Component, h, Prop, Watch, Element } from '@stencil/core';
-import { createProvider } from '../../libs/context';
 import { Provider } from '../../libs/provider';
 
 @Component({
@@ -16,7 +15,7 @@ export class CtxProvider
 
     componentWillLoad()
     {
-        this.provider = createProvider(this.el, this.name, this.value);
+        this.provider = Provider.create(this.el, this.name, this.value);
     }
 
     @Watch("value")

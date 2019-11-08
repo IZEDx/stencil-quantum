@@ -1,5 +1,5 @@
 import { Component, Element, Prop, State } from '@stencil/core';
-import { findProvider } from '../../libs/context';
+import { Provider } from '../../libs/provider';
 
 @Component({
     tag: 'ctx-consumer'
@@ -14,13 +14,8 @@ export class CtxConsumer {
 
     componentWillLoad()
     {
-        const provider = findProvider(this.el, this.name);
-        provider.listen(this.updateVal.bind(this));
-    }
-
-    updateVal(val: any)
-    {
-        this.value = this.mapper(val);
+        const provider = Provider.find(this.el, this.name);
+        provider.listen(val => this.value = this.mapper(val));
     }
 
     render() {
