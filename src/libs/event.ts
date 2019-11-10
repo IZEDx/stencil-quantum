@@ -49,13 +49,15 @@ export function Emit<
     } 
 }
 
+type ReceiveEvents<T> = T extends EventEmitter ? Parameters<T["on"]>[0] : string;
+
 export function Receive<
     T extends EventEmitter = any, 
-    E extends Parameters<T["on"]>[0] = any, 
-    Event extends E|undefined = undefined
+    E extends ReceiveEvents<T> = ReceiveEvents<T>, 
+    Event extends E|undefined = E|undefined
 >(emitterKey: string, event?: Event) 
 { 
-    return function (prototype: ComponentPrototype, propertyName: Event extends undefined ? E : string)
+    return function (prototype: ComponentPrototype, propertyName: Event extends E ? string : E)
     {
         const _event = event || propertyName;
         let el: HTMLStencilElement;
