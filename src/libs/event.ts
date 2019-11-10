@@ -72,6 +72,7 @@ export function Receive(emitterKey: string, event?: string)
             Object.defineProperty(prototype, propertyName, 
             {
                 get: () => value,
+                set: onValue,
                 enumerable: true,
                 configurable: true
             });

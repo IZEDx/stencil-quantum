@@ -49,6 +49,10 @@ export function Get(axiosKey: string, path: string, paramsKey?: string)
             Object.defineProperty(prototype, propertyName, 
             {
                 get: () => value,
+                set: (v) => {
+                    value = v;
+                    if (el) el.forceUpdate();
+                },
                 enumerable: true,
                 configurable: true
             });

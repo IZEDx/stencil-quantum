@@ -33,6 +33,7 @@ export function Context(key?: string)
     {
         key = key || propertyName;
         let provider: Provider<any>;
+        let defaultValue: any;
 
         hookComponent(prototype, obj => {
             const el = getEl(obj);
@@ -44,7 +45,8 @@ export function Context(key?: string)
         {
             Object.defineProperty(prototype, propertyName, 
             {
-                get: () => provider && provider.retrieve(),
+                get: () => (provider && provider.retrieve()) || defaultValue,
+                set: v => defaultValue = v,
                 enumerable: true,
                 configurable: true
             });
