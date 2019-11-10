@@ -10,18 +10,22 @@ export interface EventEmitter
     off(event: string, fn: (...args: any[]) => any): EventEmitter;
 }
 
-export function Emit<K extends string>(emitterKey: K, event?: string) 
+export function Emit<
+    T extends EventEmitter = any, 
+    E extends Parameters<T["emit"]>[0] = any, 
+    Event extends E|undefined = undefined
+>(emitterKey: string, event?: Event) 
 { 
-    return function (prototype: ComponentPrototype, propertyName: string)
+    return function (prototype: ComponentPrototype, propertyName: Event extends E ? string : E)
     {
-        event = event || propertyName;
+        const _event = event || propertyName;
         let provider: Provider<EventEmitter>;
         let value: any = prototype[propertyName];
 
         hookComponent(prototype, obj => {
             const el = getEl(obj);
             provider = Provider.find(el, emitterKey);
-            if (value) provider.retrieve().emit(event!, value);
+            if (value) provider.retrieve().emit(_event!, value);
             provider.hook(el);
         });
 
@@ -32,7 +36,7 @@ export function Emit<K extends string>(emitterKey: K, event?: string)
                 get: () => value,
                 set: (v: any) => {
                     if (provider) {
-                        provider.retrieve().emit(event!, v);
+                        provider.retrieve().emit(_event!, v);
                     }
                     value = v;
                 },
@@ -43,13 +47,17 @@ export function Emit<K extends string>(emitterKey: K, event?: string)
     } 
 }
 
-export function Receive(emitterKey: string, event?: string) 
+export function Receive<
+    T extends EventEmitter = any, 
+    E extends Parameters<T["on"]>[0] = any, 
+    Event extends E|undefined = undefined
+>(emitterKey: string, event?: Event) 
 { 
-    return function (prototype: ComponentPrototype, propertyName: string)
+    return function (prototype: ComponentPrototype, propertyName: Event extends undefined ? E : string)
     {
-        event = event || propertyName;
+        const _event = event || propertyName;
         let el: HTMLStencilElement;
-        let value: any = prototype[propertyName];
+        let value: any = prototype[propertyName as string];
 
         const onValue = (v: any) => {
             value = v;
@@ -62,8 +70,8 @@ export function Receive(emitterKey: string, event?: string)
 
             const provider = Provider.find<EventEmitter>(el, emitterKey!);
             provider.listen(emitter => {
-                if (lastEmitter) lastEmitter.off(event!, onValue);
-                emitter.on(event!, onValue);
+                if (lastEmitter) lastEmitter.off(_event!, onValue);
+                emitter.on(_event!, onValue);
             });
         });
 

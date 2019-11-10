@@ -1,6 +1,7 @@
 import { Provider } from "./provider";
 import { getEl, hookComponent, ComponentPrototype } from "./utils";
 import { HTMLStencilElement } from "@stencil/core/internal";
+import { RestypedBase } from "restyped";
 
 export interface AxiosResponse<T>
 {
@@ -12,9 +13,15 @@ export interface AxiosInstance
     get(path: string, config?: { params?: Record<string, string> }): Promise<AxiosResponse<any>>;
 }
 
-export function Get(axiosKey: string, path: string, paramsKey?: string) 
+type ValidPrototype<Schema extends RestypedBase, Path extends keyof Schema, Method extends "GET"|"POST"|"PUT"> = Schema[Path][Method] extends undefined ? never : ComponentPrototype;
+
+export function Get<
+    Schema extends RestypedBase = any, 
+    Path extends keyof Schema = any, 
+    Proto extends ValidPrototype<Schema, Path, "GET"> = ValidPrototype<Schema, Path, "GET">
+>(axiosKey: string, path: Path, paramsKey?: string)
 { 
-    return function (prototype: ComponentPrototype, propertyName: string)
+    return function (prototype: Proto, propertyName: string)
     {
         let value: any = prototype[propertyName];
         let el: HTMLStencilElement;
@@ -22,7 +29,7 @@ export function Get(axiosKey: string, path: string, paramsKey?: string)
         let params: Record<string, any>;
 
         const get = async (params?: Record<string, any>) => {
-            const query = makeQuery(path, params);
+            const query = makeQuery(path as string, params);
             const response = await axios.get(query.path, {params: query.params});
             value = response.data;
             el.forceUpdate();

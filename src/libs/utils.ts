@@ -24,6 +24,8 @@ export interface ComponentPrototype {
     [key: string]: any;
 };
 
+export type ComponentDecorator<K extends string> = (prototype: ComponentPrototype, propertyKey: K) => any;
+
 export function hookComponent(prototype: ComponentPrototype, willLoad: (obj: any) => void)
 {
     const _componentWillLoad = prototype["componentWillLoad"] || nop;
