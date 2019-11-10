@@ -24,13 +24,13 @@ export function Get(axiosKey: string, path: string, paramsKey?: string)
         const get = async (params?: Record<string, any>) => {
             const query = makeQuery(path, params);
             const response = await axios.get(query.path, {params: query.params});
-            value = response.data();
+            value = response.data;
             el.forceUpdate();
         }
 
         hookComponent(prototype, async obj => {
             el = getEl(obj);            
-            
+
             Provider.find<AxiosInstance>(el, axiosKey).listen(async a => {
                 axios = a
                 if (!paramsKey || !!params) get();
