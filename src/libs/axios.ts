@@ -13,17 +13,21 @@ export interface AxiosInstance
     get(path: string, config?: { params?: Record<string, string> }): Promise<AxiosResponse<any>>;
 }
 
-type ValidPrototype<Schema extends RestypedBase, Path extends ValidPath<Schema>, Method extends "GET"|"POST"|"PUT"> = Schema[Path][Method] extends undefined ? never : ComponentPrototype;
+type ValidPrototype<Schema extends RestypedBase, Path extends ValidPath<Schema>, Method extends "GET"|"POST"|"PUT", K extends string> = 
+    Schema[Path][Method] extends undefined ? never : ComponentPrototype&{
+        [key in K]: Schema[Path][Method]["response"]
+    };
 type ValidPath<Schema extends RestypedBase> = Schema extends RestypedBase ? keyof Schema : string;
 
 
 export function Get<
     Schema extends RestypedBase = any, 
     Path extends ValidPath<Schema> = ValidPath<Schema>, 
-    Proto extends ValidPrototype<Schema, Path, "GET"> = ValidPrototype<Schema, Path, "GET">
+    PKey extends string = string,
+    Proto extends ValidPrototype<Schema, Path, "GET", PKey> = ValidPrototype<Schema, Path, "GET", PKey>
 >(axiosKey: string, path: Path, paramsKey?: string)
 { 
-    return function (prototype: Proto, propertyName: string)
+    return function (prototype: Proto, propertyName: PKey)
     {
         let value: any = prototype[propertyName];
         let el: HTMLStencilElement;
