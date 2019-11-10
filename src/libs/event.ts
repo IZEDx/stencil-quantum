@@ -10,10 +10,12 @@ export interface EventEmitter
     off(event: string, fn: (...args: any[]) => any): EventEmitter;
 }
 
+type EmitEvents<T> = T extends EventEmitter ? Parameters<T["emit"]>[0] : string;
+
 export function Emit<
     T extends EventEmitter = any, 
-    E extends Parameters<T["emit"]>[0] = any, 
-    Event extends E|undefined = undefined
+    E extends EmitEvents<T> = EmitEvents<T>, 
+    Event extends E|undefined = E|undefined
 >(emitterKey: string, event?: Event) 
 { 
     return function (prototype: ComponentPrototype, propertyName: Event extends E ? string : E)

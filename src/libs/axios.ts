@@ -13,11 +13,13 @@ export interface AxiosInstance
     get(path: string, config?: { params?: Record<string, string> }): Promise<AxiosResponse<any>>;
 }
 
-type ValidPrototype<Schema extends RestypedBase, Path extends keyof Schema, Method extends "GET"|"POST"|"PUT"> = Schema[Path][Method] extends undefined ? never : ComponentPrototype;
+type ValidPrototype<Schema extends RestypedBase, Path extends ValidPath<Schema>, Method extends "GET"|"POST"|"PUT"> = Schema[Path][Method] extends undefined ? never : ComponentPrototype;
+type ValidPath<Schema extends RestypedBase> = Schema extends RestypedBase ? keyof Schema : string;
+
 
 export function Get<
     Schema extends RestypedBase = any, 
-    Path extends keyof Schema = any, 
+    Path extends ValidPath<Schema> = ValidPath<Schema>, 
     Proto extends ValidPrototype<Schema, Path, "GET"> = ValidPrototype<Schema, Path, "GET">
 >(axiosKey: string, path: Path, paramsKey?: string)
 { 
