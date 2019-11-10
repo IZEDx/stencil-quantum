@@ -53,7 +53,7 @@ export function Receive(emitterKey: string, event?: string)
 
         const onValue = (v: any) => {
             value = v;
-            el.forceUpdate();
+            if (el) el.forceUpdate();
         };
 
         hookComponent(prototype, obj => {
