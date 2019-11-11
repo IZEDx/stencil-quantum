@@ -54,6 +54,19 @@ export function Context(key?: string)
     } 
 }
 
+export function WatchContext(key?: string) 
+{ 
+    return function (prototype: ComponentPrototype, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor
+    {
+        key = key || propertyName;
+        const method = propertyDesciptor.value;
 
+        hookComponent(prototype, obj => {
+            const el = getEl(obj);
+            const provider = Provider.find(el, key!);
+            provider.listen(v => method.apply(obj, [v]));
+        });
 
-
+        return propertyDesciptor;
+    } 
+}
