@@ -32,6 +32,7 @@
     "url": "https://github.com/IZEDx/stencil-quantum/issues"
   },
   "scripts": {
+    "np": "npx np",
     "build": "npm run stencil -- build --docs",
     "start": "npm run stencil -- --dev --watch",
     "test": "npm run stencil -- test --spec --e2e",

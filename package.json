@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "np": "cd packages/quantum && npm run np",
     "dev": "cd packages/quantum && npm start",
     "demo": "cd packages/demo && npm start",
     "bootstrap": "npx lerna bootstrap",
