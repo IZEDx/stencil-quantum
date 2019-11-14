@@ -80,7 +80,7 @@ export class Provider<T>
         {
             const found = providers.filter(provider => provider.key === key);
             if (found.length > 1) {
-                throw new QuantumError(`Found multiple providers with key "${String(key)}" on the same object!`);
+                throw new QuantumError(`Found multiple "${String(key)}" providers on the same object!`);
             } else if (found.length === 1) {
                 return found[0];
             }
@@ -88,7 +88,7 @@ export class Provider<T>
         
         if(!el.parentElement)
         {
-            throw new QuantumError(`No provider in hierarchy found with key "${String(key)}!"`);
+            throw new QuantumError(`No provider in hierarchy found that matches "${String(key)}"!`);
         }
         else
         {

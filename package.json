@@ -1,49 +1,24 @@
 {
-  "name": "stencil-quantum",
-  "version": "0.5.5",
-  "description": "Stencil Quantum",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "es2015": "dist/esm/index.mjs",
-  "es2017": "dist/esm/index.mjs",
-  "types": "dist/types/index.d.ts",
-  "collection": "dist/collection/collection-manifest.json",
-  "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/stencil-quantum/stencil-quantum.js",
-  "files": [
-    "dist/",
-    "loader/"
-  ],
-  "author": "nk@ized.io",
-  "homepage": "https://github.com/IZEDx/stencil-quantum",
-  "keywords": [
-    "TypeScript",
-    "Stencil",
-    "Quantum",
-    "Axios",
-    "EventEmitter",
-    "Frontend"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:IZEDx/stencil-quantum.git"
-  },
-  "bugs": {
-    "url": "https://github.com/IZEDx/stencil-quantum/issues"
-  },
+  "name": "root",
+  "private": true,
   "scripts": {
-    "build": "npx stencil build --docs",
-    "start": "npx stencil build --dev --watch --serve",
-    "test": "npx stencil test --spec --e2e",
-    "test.watch": "npx stencil test --spec --e2e --watchAll",
-    "generate": "npx stencil generate"
+    "dev": "cd packages/quantum && npm start",
+    "demo": "cd packages/demo && npm start",
+    "bootstrap": "npx lerna bootstrap",
+    "test": "npm run test:demo & npm run test:quantum",
+    "test:quantum": "cd packages/quantum && npm test",
+    "test:demo": "cd packages/demo && npm test",
+    "build": "cd packages/quantum && npm run build"
   },
   "devDependencies": {
     "@stencil/core": "^1.8.0",
-    "typescript": "^3.7.2"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "restyped": "^1.1.0"
+    "@stencil/router": "latest",
+    "typescript": "^3.7.2",
+    "lerna": "latest",
+    "@types/jest": "24.0.23",
+    "@types/puppeteer": "1.20.2",
+    "jest": "24.9.0",
+    "jest-cli": "24.9.0",
+    "puppeteer": "1.20.0"
   }
 }

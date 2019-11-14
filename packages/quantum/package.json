@@ -1,0 +1,49 @@
+{
+  "name": "stencil-quantum",
+  "version": "0.5.5",
+  "description": "Experience the quantum realm of stencil.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "es2015": "dist/esm/index.mjs",
+  "es2017": "dist/esm/index.mjs",
+  "types": "dist/types/index.d.ts",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "unpkg": "dist/stencil-quantum/stencil-quantum.js",
+  "files": [
+    "dist/",
+    "loader/"
+  ],
+  "author": "nk@ized.io",
+  "homepage": "https://github.com/IZEDx/stencil-quantum",
+  "keywords": [
+    "TypeScript",
+    "Stencil",
+    "Quantum",
+    "Axios",
+    "EventEmitter",
+    "Frontend"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:IZEDx/stencil-quantum.git"
+  },
+  "bugs": {
+    "url": "https://github.com/IZEDx/stencil-quantum/issues"
+  },
+  "scripts": {
+    "build": "npm run stencil -- build --docs",
+    "start": "npm run stencil -- --dev --watch",
+    "test": "npm run stencil -- test --spec --e2e",
+    "test.watch": "npm run stencil -- test --spec --e2e --watchAll",
+    "generate": "npm run stencil -- generate",
+    "stencil": "../../node_modules/.bin/stencil"
+  },
+  "devDependencies": {
+    "np": "latest"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "restyped": "^1.1.0"
+  }
+}
