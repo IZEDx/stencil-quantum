@@ -35,9 +35,9 @@ export function Context(key?: string)
         let provider: Provider<any>;
         let defaultValue: any;
 
-        hookComponent(prototype, obj => {
+        hookComponent(prototype, async obj => {
             const el = getEl(obj);
-            provider = Provider.find(el, key!);
+            provider = await Provider.find(el, key!);
             provider.hook(el);
         });
 
@@ -61,9 +61,9 @@ export function WatchContext(key?: string)
         key = key || propertyName;
         const method = propertyDesciptor.value;
 
-        hookComponent(prototype, obj => {
+        hookComponent(prototype, async obj => {
             const el = getEl(obj);
-            const provider = Provider.find(el, key!);
+            const provider = await Provider.find(el, key!);
             provider.listen(v => method.apply(obj, [v]));
         });
 
