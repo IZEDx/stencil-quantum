@@ -14,6 +14,23 @@
     "dist/",
     "loader/"
   ],
+  "author": "nk@ized.io",
+  "homepage": "https://github.com/IZEDx/stencil-quantum",
+  "keywords": [
+    "TypeScript",
+    "Stencil",
+    "Quantum",
+    "Axios",
+    "EventEmitter",
+    "Frontend"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:IZEDx/stencil-quantum.git"
+  },
+  "bugs": {
+    "url": "https://github.com/IZEDx/stencil-quantum/issues"
+  },
   "scripts": {
     "build": "npx stencil build --docs",
     "start": "npx stencil build --dev --watch --serve",
@@ -22,9 +39,8 @@
     "generate": "npx stencil generate"
   },
   "devDependencies": {
-    "@stencil/core": "^1.3.3",
-    "@stencil/sass": "^1.1.1",
-    "typescript": "^3.6.4"
+    "@stencil/core": "^1.8.0",
+    "typescript": "^3.7.2"
   },
   "license": "MIT",
   "dependencies": {
