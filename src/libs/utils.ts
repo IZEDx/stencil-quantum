@@ -27,13 +27,17 @@ export interface ComponentPrototype {
 
 export type ComponentDecorator<K extends string> = (prototype: ComponentPrototype, propertyKey: K) => any;
 
-export function hookComponent<K extends keyof ComponentPrototype>(prototype: ComponentPrototype, key: K, cb: (obj: any) => Promise<void>|void)
+
+type Callback = (obj: any) => Promise<void>|void;
+export function hookComponent<K extends keyof ComponentPrototype>(prototype: ComponentPrototype, key: K, cb: (obj: any) => Promise<Callback|void>|Callback|void)
 {
     const _original = prototype[key] || nop;
 
     prototype[key] = async function(...args: any[]) {
         log(key, this);
-        await cb(this);
-        return _original.apply(this, args);
+        const cb2 = await cb(this);
+        let result = await _original.apply(this, args);
+        if (cb2 instanceof Function) await cb2(this);
+        return result;
     }
 }

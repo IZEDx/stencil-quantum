@@ -23,22 +23,24 @@ export function Emit<
         const _event = event || propertyName;
         let provider: Provider<EventEmitter>;
         let value: any = prototype[propertyName];
-        let el: HTMLStencilElement;
 
         hookComponent(prototype, "componentWillLoad", obj => {
-            el = getEl(obj);
+            const el = getEl(obj);
+            
             try {
                 provider = Provider.find(el, emitterKey);
                 if (value) provider.retrieve().emit(_event!, value);
                 provider.hook(el);
-            } catch(err) {}
-        });
+            } catch(err) {
+                
+            }
 
-        hookComponent(prototype, "componentDidLoad", obj => {
-            if (provider) provider.unhook(el);
-            provider = Provider.find(el, emitterKey);
-            if (value) provider.retrieve().emit(_event!, value);
-            provider.hook(el);
+            return () => {
+                if (provider) provider.unhook(el);
+                provider = Provider.find(el, emitterKey);
+                if (value) provider.retrieve().emit(_event!, value);
+                provider.hook(el);
+            }
         });
 
         if (delete prototype[propertyName]) 
@@ -72,9 +74,6 @@ export function Receive<
         const _event = event || propertyName;
         let el: HTMLStencilElement;
         let value: any = prototype[propertyName as string];
-        let provider: Provider<any>;
-        let lastEmitter: EventEmitter;
-        let unlisten = () => {};
 
         const onValue = (v: any) => {
             value = v;
@@ -82,23 +81,29 @@ export function Receive<
         };
 
         hookComponent(prototype, "componentWillLoad", obj => {
+            let provider: Provider<any>;
+            let lastEmitter: EventEmitter;
+            let unlisten = () => {};
             el = getEl(obj);
+
             try {
                 provider = Provider.find(el, emitterKey);
                 provider.listen(emitter => {
                     if (lastEmitter) lastEmitter.off(_event!, onValue);
                     emitter.on(_event!, onValue);
                 });
-            } catch(err) {}
-        });
+            } catch(err) {
 
-        hookComponent(prototype, "componentDidLoad", obj => {
-            if (provider) unlisten();
-            provider = Provider.find<EventEmitter>(el, emitterKey!);
-            provider.listen(emitter => {
-                if (lastEmitter) lastEmitter.off(_event!, onValue);
-                emitter.on(_event!, onValue);
-            });
+            }
+            
+            return () => {
+                if (provider) unlisten();
+                provider = Provider.find<EventEmitter>(el, emitterKey!);
+                provider.listen(emitter => {
+                    if (lastEmitter) lastEmitter.off(_event!, onValue);
+                    emitter.on(_event!, onValue);
+                });
+            }
         });
 
         if (delete prototype[propertyName]) 

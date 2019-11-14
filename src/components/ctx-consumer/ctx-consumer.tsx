@@ -12,7 +12,7 @@ export class CtxConsumer {
     @Prop() mapper = (val: any) => `${val}`;
     @State() value!: string;
 
-    async componentDidLoad()
+    async componentWillLoad()
     {
         const provider = Provider.find(this.el, this.name);
         provider.listen(val => this.value = this.mapper(val));
