@@ -7,6 +7,7 @@ export type ProvideCallback<T> = (value: T) => void;
 export class Provider<T>
 {
     listeners = [] as ProvideCallback<T>[];
+    hooks = new Map<HTMLStencilElement, Function>();
 
     constructor(public readonly key: string|symbol, private value: T)
     {
@@ -53,10 +54,21 @@ export class Provider<T>
         this.hook(el);
     }
 
-    hook<T>(el: HTMLStencilElement)
+    isHooked(el: HTMLStencilElement)
+    {
+        return this.hooks.has(el);
+    }
+
+    hook(el: HTMLStencilElement)
     {
         log("Hook Provider", el, this);
-        this.listen(() => el.forceUpdate());
+        this.hooks.set(el, this.listen(() => el.forceUpdate()));
+    }
+
+    unhook(el: HTMLStencilElement)
+    {
+        log("Unhook Provider", el, this);
+        this.hooks.delete(el);
     }
     
     static find<T>(el: HTMLElement, key: string|symbol): Provider<T>

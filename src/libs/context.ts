@@ -1,5 +1,6 @@
 import { Provider } from "./provider";
 import { getEl, hookComponent, ComponentPrototype } from "./utils";
+import { HTMLStencilElement } from "@stencil/core/internal";
 
 export function Provide(key?: string|symbol) 
 { 
@@ -34,9 +35,18 @@ export function Context(key?: string)
         key = key || propertyName;
         let provider: Provider<any>;
         let defaultValue: any;
+        let el: HTMLStencilElement;
+
+        hookComponent(prototype, "componentWillLoad", obj => {
+            el = getEl(obj);
+            try {
+                provider = Provider.find(el, key!);
+                provider.hook(el);
+            } catch(err) {}
+        });
 
         hookComponent(prototype, "componentDidLoad", obj => {
-            const el = getEl(obj);
+            if (provider) provider.unhook(el);
             provider = Provider.find(el, key!);
             provider.hook(el);
         });
@@ -60,9 +70,20 @@ export function WatchContext(key?: string)
     {
         key = key || propertyName;
         const method = propertyDesciptor.value;
+        let el: HTMLStencilElement;
+        let provider: Provider<any>;
+        let unlisten = () => {};
+
+        hookComponent(prototype, "componentWillLoad", obj => {
+            el = getEl(obj);
+            try {
+                provider = Provider.find(el, key!);
+                unlisten = provider.listen(v => method.apply(obj, [v]));
+            } catch(err) {}
+        });
 
         hookComponent(prototype, "componentDidLoad", obj => {
-            const el = getEl(obj);
+            unlisten();
             const provider = Provider.find(el, key!);
             provider.listen(v => method.apply(obj, [v]));
         });
