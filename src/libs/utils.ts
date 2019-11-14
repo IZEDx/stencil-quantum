@@ -20,19 +20,20 @@ export function getEl(_this: any): HTMLStencilElement
 
 export interface ComponentPrototype {
     el: HTMLStencilElement;
-    componentWillLoad?: Function;
+    componentWillLoad?: (...args: any[]) => Promise<void>|void;
+    componentDidLoad?: (...args: any[]) => Promise<void>|void;
     [key: string]: any;
 };
 
 export type ComponentDecorator<K extends string> = (prototype: ComponentPrototype, propertyKey: K) => any;
 
-export function hookComponent(prototype: ComponentPrototype, willLoad: (obj: any) => void)
+export function hookComponent<K extends keyof ComponentPrototype>(prototype: ComponentPrototype, key: K, cb: (obj: any) => Promise<void>|void)
 {
-    const _componentWillLoad = prototype["componentWillLoad"] || nop;
+    const _original = prototype[key] || nop;
 
-    prototype["componentWillLoad"] = function(...args: any[]) {
-        log("Will load", this);
-        willLoad(this);
-        return _componentWillLoad.apply(this, args);
+    prototype[key] = async function(...args: any[]) {
+        log(key, this);
+        await cb(this);
+        return _original.apply(this, args);
     }
 }

@@ -8,7 +8,7 @@ export function Provide(key?: string|symbol)
         key = key || propertyName;
         const provider = new Provider(key, prototype[propertyName]);
 
-        hookComponent(prototype, obj => {
+        hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
             provider.attach(el);
             provider.hook(el);
@@ -35,9 +35,9 @@ export function Context(key?: string)
         let provider: Provider<any>;
         let defaultValue: any;
 
-        hookComponent(prototype, async obj => {
+        hookComponent(prototype, "componentDidLoad", obj => {
             const el = getEl(obj);
-            provider = await Provider.find(el, key!);
+            provider = Provider.find(el, key!);
             provider.hook(el);
         });
 
@@ -61,9 +61,9 @@ export function WatchContext(key?: string)
         key = key || propertyName;
         const method = propertyDesciptor.value;
 
-        hookComponent(prototype, async obj => {
+        hookComponent(prototype, "componentDidLoad", obj => {
             const el = getEl(obj);
-            const provider = await Provider.find(el, key!);
+            const provider = Provider.find(el, key!);
             provider.listen(v => method.apply(obj, [v]));
         });
 

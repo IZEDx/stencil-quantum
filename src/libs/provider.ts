@@ -59,9 +59,8 @@ export class Provider<T>
         this.listen(() => el.forceUpdate());
     }
     
-    static async find<T>(el: HTMLElement, key: string|symbol): Promise<Provider<T>>
+    static find<T>(el: HTMLElement, key: string|symbol): Provider<T>
     {
-        await new Promise(res => setTimeout(res, 0)); // defer call to allow peer providers to register first
         log("Searching Provider", key, el);
         const providers = (<any>el)[$providers] as Provider<any>[];
         log("In Providers", providers);

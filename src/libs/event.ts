@@ -24,9 +24,9 @@ export function Emit<
         let provider: Provider<EventEmitter>;
         let value: any = prototype[propertyName];
 
-        hookComponent(prototype, async obj => {
+        hookComponent(prototype, "componentDidLoad", obj => {
             const el = getEl(obj);
-            provider = await Provider.find(el, emitterKey);
+            provider = Provider.find(el, emitterKey);
             if (value) provider.retrieve().emit(_event!, value);
             provider.hook(el);
         });
@@ -68,11 +68,13 @@ export function Receive<
             if (el) el.forceUpdate();
         };
 
-        hookComponent(prototype, async obj => {
-            let lastEmitter: EventEmitter;
+        hookComponent(prototype, "componentWillLoad", obj => {
             el = getEl(obj);
+        });
 
-            const provider = await Provider.find<EventEmitter>(el, emitterKey!);
+        hookComponent(prototype, "componentDidLoad", obj => {
+            let lastEmitter: EventEmitter;
+            const provider = Provider.find<EventEmitter>(el, emitterKey!);
             provider.listen(emitter => {
                 if (lastEmitter) lastEmitter.off(_event!, onValue);
                 emitter.on(_event!, onValue);

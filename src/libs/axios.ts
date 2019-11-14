@@ -211,18 +211,20 @@ function Http<
         };
         if (ctx.fns!.init) ctx.fns!.init(ctx);
 
-        hookComponent(prototype, async obj => {
+        hookComponent(prototype, "componentWillLoad", async obj => {
             ctx.obj = obj;
             ctx.el = getEl(ctx.obj);          
             if (ctx.fns!.onComponent) await ctx.fns!.onComponent(ctx);
+        });
 
-            (await Provider.find<AxiosInstance>(ctx.el, axiosKey)).listen(async a => {
+        hookComponent(prototype, "componentDidLoad", obj => {
+            Provider.find<AxiosInstance>(ctx.el!, axiosKey).listen(async a => {
                 ctx.axios = a;
                 if (ctx.fns && ctx.fns.onAxios) await ctx.fns.onAxios(ctx);
             });        
             
             if (paramsKey !== undefined)
-            (await Provider.find<Record<string, any>>(ctx.el, paramsKey)).listen(async p => {
+            Provider.find<Record<string, any>>(ctx.el!, paramsKey).listen(async p => {
                 ctx.params = p;
                 ctx.query = makeQuery(ctx.path as string, ctx.params);
                 if (ctx.fns && ctx.fns.onParams) await ctx.fns.onParams(ctx);
