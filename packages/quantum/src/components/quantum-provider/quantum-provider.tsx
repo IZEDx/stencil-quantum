@@ -2,11 +2,11 @@ import { Component, h, Prop, Watch, Element } from '@stencil/core';
 import { Provider } from '../../libs/provider';
 
 @Component({
-    tag: 'ctx-provider'
+    tag: 'quantum-provider'
 })
-export class CtxProvider 
+export class QuantumProvider 
 {
-    @Element() el!: HTMLCtxProviderElement;
+    @Element() el!: HTMLQuantumProviderElement;
 
     @Prop({reflectToAttr: true}) name!: string;
     @Prop() value: any;

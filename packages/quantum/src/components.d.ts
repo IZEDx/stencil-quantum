@@ -10,69 +10,49 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 
 export namespace Components {
-  interface CtxConsumer {
+  interface QuantumConsumer {
     'mapper': (val: any) => string;
     'name': string;
   }
-  interface CtxGreetComp {}
-  interface CtxProvider {
+  interface QuantumProvider {
     'name': string;
     'value': any;
   }
-  interface CtxTestComp {}
 }
 
 declare global {
 
 
-  interface HTMLCtxConsumerElement extends Components.CtxConsumer, HTMLStencilElement {}
-  var HTMLCtxConsumerElement: {
-    prototype: HTMLCtxConsumerElement;
-    new (): HTMLCtxConsumerElement;
+  interface HTMLQuantumConsumerElement extends Components.QuantumConsumer, HTMLStencilElement {}
+  var HTMLQuantumConsumerElement: {
+    prototype: HTMLQuantumConsumerElement;
+    new (): HTMLQuantumConsumerElement;
   };
 
-  interface HTMLCtxGreetCompElement extends Components.CtxGreetComp, HTMLStencilElement {}
-  var HTMLCtxGreetCompElement: {
-    prototype: HTMLCtxGreetCompElement;
-    new (): HTMLCtxGreetCompElement;
-  };
-
-  interface HTMLCtxProviderElement extends Components.CtxProvider, HTMLStencilElement {}
-  var HTMLCtxProviderElement: {
-    prototype: HTMLCtxProviderElement;
-    new (): HTMLCtxProviderElement;
-  };
-
-  interface HTMLCtxTestCompElement extends Components.CtxTestComp, HTMLStencilElement {}
-  var HTMLCtxTestCompElement: {
-    prototype: HTMLCtxTestCompElement;
-    new (): HTMLCtxTestCompElement;
+  interface HTMLQuantumProviderElement extends Components.QuantumProvider, HTMLStencilElement {}
+  var HTMLQuantumProviderElement: {
+    prototype: HTMLQuantumProviderElement;
+    new (): HTMLQuantumProviderElement;
   };
   interface HTMLElementTagNameMap {
-    'ctx-consumer': HTMLCtxConsumerElement;
-    'ctx-greet-comp': HTMLCtxGreetCompElement;
-    'ctx-provider': HTMLCtxProviderElement;
-    'ctx-test-comp': HTMLCtxTestCompElement;
+    'quantum-consumer': HTMLQuantumConsumerElement;
+    'quantum-provider': HTMLQuantumProviderElement;
   }
 }
 
 declare namespace LocalJSX {
-  interface CtxConsumer {
+  interface QuantumConsumer {
     'mapper'?: (val: any) => string;
     'name': string;
   }
-  interface CtxGreetComp {}
-  interface CtxProvider {
+  interface QuantumProvider {
     'name': string;
     'value'?: any;
   }
-  interface CtxTestComp {}
 
   interface IntrinsicElements {
-    'ctx-consumer': CtxConsumer;
-    'ctx-greet-comp': CtxGreetComp;
-    'ctx-provider': CtxProvider;
-    'ctx-test-comp': CtxTestComp;
+    'quantum-consumer': QuantumConsumer;
+    'quantum-provider': QuantumProvider;
   }
 }
 
@@ -82,10 +62,8 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
-      'ctx-consumer': LocalJSX.CtxConsumer & JSXBase.HTMLAttributes<HTMLCtxConsumerElement>;
-      'ctx-greet-comp': LocalJSX.CtxGreetComp & JSXBase.HTMLAttributes<HTMLCtxGreetCompElement>;
-      'ctx-provider': LocalJSX.CtxProvider & JSXBase.HTMLAttributes<HTMLCtxProviderElement>;
-      'ctx-test-comp': LocalJSX.CtxTestComp & JSXBase.HTMLAttributes<HTMLCtxTestCompElement>;
+      'quantum-consumer': LocalJSX.QuantumConsumer & JSXBase.HTMLAttributes<HTMLQuantumConsumerElement>;
+      'quantum-provider': LocalJSX.QuantumProvider & JSXBase.HTMLAttributes<HTMLQuantumProviderElement>;
     }
   }
 }

@@ -1,6 +1,6 @@
 import { Component, Prop, h, Element } from '@stencil/core';
 import { MatchResults } from '@stencil/router';
-import { WatchContext, log } from "stencil-quantum";
+import { WatchContext } from "stencil-quantum";
 
 @Component({
   tag: 'app-profile',
@@ -32,7 +32,7 @@ export class AppProfile
             through a route param!
           </p>
           <p>
-            I greet you <ctx-consumer name="personToGreet"></ctx-consumer>
+            I greet you <quantum-consumer name="personToGreet"></quantum-consumer>
           </p>
         </div>
       );

@@ -2,11 +2,11 @@ import { Component, Element, Prop, State } from '@stencil/core';
 import { Provider } from '../../libs/provider';
 
 @Component({
-    tag: 'ctx-consumer'
+    tag: 'quantum-consumer'
 })
-export class CtxConsumer {
+export class QuantumConsumer {
 
-    @Element() el!: HTMLCtxConsumerElement;
+    @Element() el!: HTMLQuantumConsumerElement;
     
     @Prop({reflectToAttr: true}) name!: string;
     @Prop() mapper = (val: any) => `${val}`;

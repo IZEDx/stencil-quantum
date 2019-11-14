@@ -68,7 +68,7 @@ export class GreetComp
 
 ## Components
 
-Stencil Quantum also comes with two components to provide and consume data. Data provided by a decorator can be consumed with a ctx-component and vice versa.
+Stencil Quantum also comes with two components to provide and consume data. Data provided by a decorator can be consumed with a quantum-component and vice versa.
 
 ### Example
 
@@ -94,13 +94,13 @@ export class MyComponent
     render() {
         return <div>
             <h1>My Component</h1>
-            <ctx-provider name="greeting" value={"John " + this.johnTimer}>
+            <quantum-provider name="greeting" value={"John " + this.johnTimer}>
                 <greet-comp></greet-comp>
-            </ctx-provider>
+            </quantum-provider>
             <br />
-            <ctx-provider name="greeting" value={"Kevin " + this.kevinTimer}>
+            <quantum-provider name="greeting" value={"Kevin " + this.kevinTimer}>
                 <greet-comp></greet-comp>
-            </ctx-provider>
+            </quantum-provider>
         </div>
     }
 }
@@ -118,7 +118,7 @@ export class GreetComp
 {
     render() {
         return <div>
-            Hello <ctx-consumer name="greeting"></ctx-consumer>
+            Hello <quantum-consumer name="greeting"></quantum-consumer>
         </div>;
     }
 }
