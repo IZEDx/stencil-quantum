@@ -25,11 +25,12 @@ export class Provider<T>
     {
         this.value = value;
         this.listeners.forEach(cb => cb(value));
+        return this;
     }
 
     update(fn: (v: T) => T)
     {
-        this.provide(fn(this.retrieve()));
+        return this.provide(fn(this.retrieve()));
     }
 
     listen(cb: ProvideCallback<T>)
@@ -44,14 +45,13 @@ export class Provider<T>
     attach<H extends boolean|undefined>(el: H extends true ? HTMLElement : HTMLStencilElement, noHook?: H)
     { 
         log("Add Provider", el, this);
-        if (!((<any>el)[$providers] instanceof Array)) {
-            (<any>el)[$providers] = [];
-        }
 
-        (<any>el)[$providers].push(this);
-        log("Total Providers", el, (<any>el)[$providers]);
+        const providers = Provider.getAttached(el);
+        if (!providers.includes(this)) providers.push(this);
+
+        log("Total Providers", el, providers);
         
-        if (!noHook) this.hook(el as any);
+        return noHook ? this : this.hook(el as any);
     }
 
     isHooked(el: HTMLStencilElement)
@@ -63,6 +63,7 @@ export class Provider<T>
     {
         log("Hook Provider", el, this);
         this.hooks.set(el, this.listen(() => el.forceUpdate()));
+        return this;
     }
 
     unhook(el: HTMLStencilElement)
@@ -72,42 +73,42 @@ export class Provider<T>
             this.hooks.get(el)!();
             this.hooks.delete(el);
         }
+        return this;
     }
     
     static find<T>(el: HTMLElement, key: string|symbol): Provider<T>
     {
         log("Searching Provider", key, el);
-        const providers = (<any>el)[$providers] as Provider<any>[];
-        log("In Providers", providers);
-        if (providers instanceof Array)
-        {
-            const found = providers.filter(provider => provider.key === key);
-            if (found.length > 1) {
-                throw new QuantumError(`Found multiple "${String(key)}" providers on the same object!`);
-            } else if (found.length === 1) {
-                return found[0];
-            }
-        } 
-        
-        if(!el.parentElement)
+        const providers = Provider.getAttached(el, p => p.key === key);
+
+        if (providers.length > 1) {
+            throw new QuantumError(`Found multiple "${String(key)}" providers on the same object!`);
+        } else if (providers.length === 1) {
+            return providers[0];
+        }
+
+        // No provider found on this el, check parent
+
+        let parent = (el.parentElement ?? el.shadowRoot?.host ?? (el.parentNode as ShadowRoot)?.host) as HTMLElement; // parentElement or shadowRoot.host
+        if(!parent)
         {
             throw new QuantumError(`No provider in hierarchy found that matches "${String(key)}"!`);
         }
-        else
-        {
-            const provider = Provider.find<T>(el.parentElement, key);
-            provider.attach(el, true);
-            return provider;
-        }
+        
+        return Provider.find<T>(parent, key).attach(el, true); // Attach reference to this el to make lookup for children shorter
     }
 
     static create<T>(el: HTMLStencilElement, key: string|symbol, value: T): Provider<T>
     {
         log("Create Provider", el, key, value);
-        const provider = new Provider(key, value);
-    
-        provider.attach(el);
-    
-        return provider;
+        return new Provider(key, value).attach(el);
+    }
+
+    static getAttached(el: HTMLElement, filter: (p: Provider<any>) => boolean = () => true): Provider<any>[]
+    {
+        if (!((<any>el)[$providers] instanceof Array)) {
+            (<any>el)[$providers] = [];
+        }
+        return (<any>el)[$providers].filter(filter);
     }
 }
