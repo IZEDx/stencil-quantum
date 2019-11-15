@@ -1,5 +1,7 @@
 import { Component, h, Element } from '@stencil/core';
-import { Provide } from 'stencil-quantum';
+import { Provide, log } from 'stencil-quantum';
+
+log.debug = true;
 
 @Component({
   tag: 'app-root',
