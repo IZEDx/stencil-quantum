@@ -1,11 +1,13 @@
 import { HTMLStencilElement } from "@stencil/core/internal";
 import { Provider } from "./provider";
 
+//#region Error Stuff
+
 export class QuantumError extends Error 
 {
     constructor(err: Error|string, public target?: HTMLStencilElement)
     {
-        super(err instanceof Error ? undefined : err);
+        super(err instanceof Error ? err.message : err);
         if (err instanceof Error) Object.assign(this, err);
     }
 }
@@ -13,6 +15,7 @@ export class QuantumError extends Error
 export function throwQuantum(el: HTMLStencilElement, error: string|Error)
 {
     const err = new QuantumError(error, el);
+    console.error(err);
     try {
         const provider = Provider.find<QuantumError>(el, "quantum-error");
         provider.provide(err);
@@ -21,6 +24,10 @@ export function throwQuantum(el: HTMLStencilElement, error: string|Error)
     }
 }
 
+//#endregion
+
+//#region Logging
+
 const _log = (...args: any[]) => (<any>_log).debug && console.log(...args);
 (<any>_log).debug = false;
 
@@ -28,14 +35,14 @@ export const log = _log as typeof _log & {debug: boolean};
 
 export const nop = () => {};
 
-export function getEl(_this: any): HTMLStencilElement
-{
-    const el = _this && _this["el"];
-    if (el instanceof Object && typeof el.forceUpdate === "function") {
-        return el;
-    }
-    throw new QuantumError("Property 'el' required!");
-}
+//#endregion
+
+//#region Provider Dom Stuff
+
+
+//#endregion
+
+//#region Stencil Component Hooking
 
 export interface ComponentPrototype {
     el: HTMLStencilElement;
@@ -60,3 +67,14 @@ export function hookComponent<K extends keyof ComponentPrototype>(prototype: Com
         return result;
     }
 }
+
+export function getEl(component: any): HTMLStencilElement
+{
+    const el = component?.["el"];
+    if (el instanceof Object && typeof el.forceUpdate === "function") {
+        return el;
+    }
+    throw new QuantumError(`Property 'el' required on ${component}`);
+}
+
+//#endregion
