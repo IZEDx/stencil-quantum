@@ -41,7 +41,7 @@ export class Provider<T>
         }
     }
 
-    attach(el: HTMLStencilElement)
+    attach<H extends boolean|undefined>(el: H extends true ? HTMLElement : HTMLStencilElement, noHook?: H)
     { 
         log("Add Provider", el, this);
         if (!((<any>el)[$providers] instanceof Array)) {
@@ -51,7 +51,7 @@ export class Provider<T>
         (<any>el)[$providers].push(this);
         log("Total Providers", el, (<any>el)[$providers]);
         
-        this.hook(el);
+        if (!noHook) this.hook(el as any);
     }
 
     isHooked(el: HTMLStencilElement)
@@ -68,7 +68,10 @@ export class Provider<T>
     unhook(el: HTMLStencilElement)
     {
         log("Unhook Provider", el, this);
-        this.hooks.delete(el);
+        if (this.isHooked(el)) {
+            this.hooks.get(el)!();
+            this.hooks.delete(el);
+        }
     }
     
     static find<T>(el: HTMLElement, key: string|symbol): Provider<T>
@@ -92,7 +95,9 @@ export class Provider<T>
         }
         else
         {
-            return Provider.find(el.parentElement, key);
+            const provider = Provider.find<T>(el.parentElement, key);
+            provider.attach(el, true);
+            return provider;
         }
     }
 
