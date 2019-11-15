@@ -1,5 +1,5 @@
 import { Provider } from "./provider";
-import { getEl, hookComponent, ComponentPrototype } from "./utils";
+import { getEl, hookComponent, ComponentPrototype, throwQuantum } from "./utils";
 import { HTMLStencilElement } from "@stencil/core/internal";
 
 export interface EventEmitter
@@ -36,10 +36,14 @@ export function Emit<
             }
 
             return () => {
-                if (provider) provider.unhook(el);
-                provider = Provider.find(el, emitterKey);
-                if (value) provider.retrieve().emit(_event!, value);
-                provider.hook(el);
+                try {
+                    if (provider) provider.unhook(el);
+                    provider = Provider.find(el, emitterKey);
+                    if (value) provider.retrieve().emit(_event!, value);
+                    provider.hook(el);
+                } catch(err) {
+                    throwQuantum(el!, err);
+                }
             }
         });
 
@@ -97,12 +101,16 @@ export function Receive<
             }
             
             return () => {
-                if (provider) unlisten();
-                provider = Provider.find<EventEmitter>(el, emitterKey!);
-                provider.listen(emitter => {
-                    if (lastEmitter) lastEmitter.off(_event!, onValue);
-                    emitter.on(_event!, onValue);
-                });
+                try {
+                    if (provider) unlisten();
+                    provider = Provider.find<EventEmitter>(el, emitterKey!);
+                    provider.listen(emitter => {
+                        if (lastEmitter) lastEmitter.off(_event!, onValue);
+                        emitter.on(_event!, onValue);
+                    });
+                } catch(err) {
+                    throwQuantum(el!, err);
+                }
             }
         });
 

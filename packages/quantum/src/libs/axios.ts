@@ -1,5 +1,5 @@
 import { Provider } from "./provider";
-import { getEl, hookComponent, ComponentPrototype, log } from "./utils";
+import { getEl, hookComponent, ComponentPrototype, log, throwQuantum } from "./utils";
 import { HTMLStencilElement } from "@stencil/core/internal";
 import { RestypedBase } from "restyped";
 
@@ -214,20 +214,36 @@ function Http<
         hookComponent(prototype, "componentWillLoad", async obj => {
             ctx.obj = obj;
             ctx.el = getEl(ctx.obj);          
-            if (ctx.fns!.onComponent) await ctx.fns!.onComponent(ctx);
+            try {
+                if (ctx.fns!.onComponent) await ctx.fns!.onComponent(ctx);
+            } catch(err) {
+                throwQuantum(ctx.el!, err);
+            }
 
             return () => {
-                Provider.find<AxiosInstance>(ctx.el!, axiosKey).listen(async a => {
-                    ctx.axios = a;
-                    if (ctx.fns && ctx.fns.onAxios) await ctx.fns.onAxios(ctx);
-                });        
-                
-                if (paramsKey !== undefined)
-                Provider.find<Record<string, any>>(ctx.el!, paramsKey).listen(async p => {
-                    ctx.params = p;
-                    ctx.query = makeQuery(ctx.path as string, ctx.params);
-                    if (ctx.fns && ctx.fns.onParams) await ctx.fns.onParams(ctx);
-                });
+                try {
+                    Provider.find<AxiosInstance>(ctx.el!, axiosKey).listen(async a => {
+                        try {
+                            ctx.axios = a;
+                            if (ctx.fns && ctx.fns.onAxios) await ctx.fns.onAxios(ctx);
+                        } catch(err) {
+                            throwQuantum(ctx.el!, err);
+                        }
+                    });        
+                    
+                    if (paramsKey !== undefined)
+                    Provider.find<Record<string, any>>(ctx.el!, paramsKey).listen(async p => {
+                        try {
+                            ctx.params = p;
+                            ctx.query = makeQuery(ctx.path as string, ctx.params);
+                            if (ctx.fns && ctx.fns.onParams) await ctx.fns.onParams(ctx);
+                        } catch(err) {
+                            throwQuantum(ctx.el!, err);
+                        }
+                    });
+                } catch(err) {
+                    throwQuantum(ctx.el!, err);
+                }
             }
         });
 

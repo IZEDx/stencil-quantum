@@ -1,5 +1,5 @@
 import { Provider } from "./provider";
-import { getEl, hookComponent, ComponentPrototype } from "./utils";
+import { getEl, hookComponent, ComponentPrototype, throwQuantum } from "./utils";
 
 export function Provide(key?: string|symbol) 
 { 
@@ -10,8 +10,12 @@ export function Provide(key?: string|symbol)
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
-            provider.attach(el);
-            provider.hook(el);
+            try {
+                provider.attach(el);
+                provider.hook(el);
+            } catch(err) {
+                throwQuantum(el, err);
+            }
         });
 
         if (delete prototype[propertyName]) 
@@ -45,9 +49,13 @@ export function Context(key?: string)
             }
 
             return () => {
-                if (provider) provider.unhook(el);
-                provider = Provider.find(el, key!);
-                provider.hook(el);
+                try {
+                    if (provider) provider.unhook(el);
+                    provider = Provider.find(el, key!);
+                    provider.hook(el);
+                } catch(err) {
+                    throwQuantum(el, err);
+                }
             }
         });
 
@@ -82,8 +90,18 @@ export function WatchContext(key?: string)
 
             return () => {
                 unlisten();
-                const provider = Provider.find(el, key!);
-                provider.listen(v => method.apply(obj, [v]));
+                try {
+                    const provider = Provider.find(el, key!);
+                    provider.listen(v => { 
+                        try {
+                            return method.apply(obj, [v]);
+                        } catch(err) {
+                            throwQuantum(el, err);
+                        }
+                    });
+                } catch(err) {
+                    throwQuantum(el, err);
+                }
             }
         });
 

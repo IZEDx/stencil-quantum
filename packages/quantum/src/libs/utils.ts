@@ -1,6 +1,25 @@
 import { HTMLStencilElement } from "@stencil/core/internal";
+import { Provider } from "./provider";
 
-export class QuantumError extends Error {}
+export class QuantumError extends Error 
+{
+    constructor(err: Error|string, public target?: HTMLStencilElement)
+    {
+        super(err instanceof Error ? undefined : err);
+        if (err instanceof Error) Object.assign(this, err);
+    }
+}
+
+export function throwQuantum(el: HTMLStencilElement, error: string|Error)
+{
+    const err = new QuantumError(error, el);
+    try {
+        const provider = Provider.find<QuantumError>(el, "quantum-error");
+        provider.provide(err);
+    } catch(e) {
+        throw err;
+    }
+}
 
 const _log = (...args: any[]) => (<any>_log).debug && console.log(...args);
 (<any>_log).debug = false;
