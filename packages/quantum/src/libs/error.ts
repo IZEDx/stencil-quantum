@@ -26,6 +26,36 @@ export function throwQuantum(el: HTMLStencilElement, error: string|Error)
     }
 }
 
+export function Throw() 
+{ 
+    return function (prototype: ComponentPrototype, propertyName: string)
+    {
+        let provider: Provider<any>;
+
+        hookComponent(prototype, "componentWillLoad", obj => {
+            const el = getEl(obj);
+            try {
+                provider = Provider.find<QuantumError>(el, $error);
+                provider.attach(el);
+                provider.hook(el);
+            } catch(err) {
+                throwQuantum(el, err);
+            }
+        });
+
+        if (delete prototype[propertyName]) 
+        {
+            Object.defineProperty(prototype, propertyName, 
+            {
+                get: () => provider?.retrieve(),
+                set: (v) => provider?.provide(v),
+                enumerable: true,
+                configurable: true
+            });
+        }
+    } 
+}
+
 export function ContextError() 
 { 
     return function (prototype: ComponentPrototype, propertyName: string)
