@@ -1,5 +1,7 @@
 import { Component, h, Element, Listen } from '@stencil/core';
-import { Provide } from 'stencil-quantum';
+import { Provide, log } from 'stencil-quantum';
+
+log.debug = true;
 
 const demoNames = [
 	"Alice", "Bob", "Cindy", "Danny", "Erica", "Felix"
