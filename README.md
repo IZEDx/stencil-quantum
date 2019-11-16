@@ -10,6 +10,8 @@ It serves a similar purpose as [stencil-state-tunnel](https://github.com/ionic-t
 
 Originally Stencil Quantum was intended to be called Stencil Context, however stencil-context was taken on npm just two weeks prior to the first prototype of this library. This, however, turned out to be quite fortunate considering that [stencil-context](https://www.npmjs.com/package/stencil-context) aims to replicate [react-context](https://reactjs.org/docs/context.html), whereas Stencil Quantum takes a more inexplicit approach, which both fit better.
 
+The demo app, hosted via github pages, can be visited here: https://quantum.ized.io/
+
 ---
 
 ## The Quantum Realm
