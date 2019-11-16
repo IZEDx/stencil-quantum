@@ -25,6 +25,7 @@ export namespace Components {
   }
   interface UtilThemer {
     'active': boolean;
+    'defaultTheme': string;
     'thumbScale': number;
     'thumbSize': number;
     'url': string;
@@ -95,6 +96,7 @@ declare namespace LocalJSX {
   }
   interface UtilThemer {
     'active'?: boolean;
+    'defaultTheme'?: string;
     'onCloseThemer'?: (event: CustomEvent<void>) => void;
     'onSelectTheme'?: (event: CustomEvent<string>) => void;
     'thumbScale'?: number;

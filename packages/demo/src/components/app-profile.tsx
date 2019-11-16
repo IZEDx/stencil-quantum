@@ -25,20 +25,17 @@ export class AppProfile
   render() {
     if (this.match && this.match.params.name) {
       return (
-        <div class="segment">
+        <section class="section">
           <div class="container">
-            <div class="content">
-              <div class="spacer"></div>
-              <h1 class="h1">
-                Hello <quantum-consumer name="personToGreet"></quantum-consumer>!
-              </h1>
-              <p class="p">
-                My name is {this.normalize(this.match.params.name)}. My name was passed in
-                through a route param!
-              </p>
-            </div>
+            <h1 class="title">
+              Hello <quantum-consumer name="personToGreet"></quantum-consumer>!
+            </h1>
+            <p>
+              My name is {this.normalize(this.match.params.name)}. My name was passed in
+              through a route param!
+            </p>
           </div>
-        </div>
+        </section>
       );
     }
   }

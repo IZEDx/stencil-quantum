@@ -11,6 +11,7 @@ interface Theme {
 })
 export class UtilThemer {
     
+    @Prop() defaultTheme = "Cosmo";
     @Prop() active = false;
     @Prop() thumbSize = 142;
     @Prop() thumbScale = 0.42;
@@ -37,7 +38,9 @@ export class UtilThemer {
         }
         else 
         {
-            this.selectedTheme = 0;
+            this.selectedTheme = this.themes.find(t => t.name === this.defaultTheme) 
+                ? this.themes.findIndex(t => t.name === this.defaultTheme)
+                : 0;
         }
     }
 
