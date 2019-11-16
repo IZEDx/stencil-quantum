@@ -79,7 +79,7 @@ export class Provider<T>
     static find<T>(el: HTMLElement, key: string|symbol): Provider<T>
     {
         log("Searching Provider", key, el);
-        const providers = Provider.getAttached(el, p => p.key === key);
+        const providers = Provider.getAttached(el).filter(p => p.key === key);
 
         if (providers.length > 1) {
             throw new QuantumError(`Found multiple "${String(key)}" providers on the same object!`);
@@ -104,11 +104,11 @@ export class Provider<T>
         return new Provider(key, value).attach(el);
     }
 
-    static getAttached(el: HTMLElement, filter: (p: Provider<any>) => boolean = () => true): Provider<any>[]
+    static getAttached(el: HTMLElement): Provider<any>[]
     {
         if (!((<any>el)[$providers] instanceof Array)) {
             (<any>el)[$providers] = [];
         }
-        return (<any>el)[$providers].filter(filter);
+        return (<any>el)[$providers];
     }
 }

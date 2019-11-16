@@ -1,0 +1,1 @@
+import{r as t,h as s,g as r}from"./p-80430b56.js";import{P as e}from"./p-51e9582a.js";const o=class{constructor(s){t(this,s)}componentWillLoad(){this.provider=e.create(this.el,this.name,this.value)}onValue(t){this.provider.provide(t)}render(){return s("slot",null)}get el(){return r(this)}static get watchers(){return{value:["onValue"]}}};export{o as quantum_provider};
