@@ -11,7 +11,7 @@
     "test:demo": "cd packages/demo && npm test",
     "build": "cd packages/quantum && npm run build",
     "build:demo": "cd packages/demo && npm run build",
-    "build:docs": "npm run build:demo && rm -rf ./docs && cp -r packages/demo/www docs && cp -r packages/demo/copy-docs/* docs/"
+    "build:docs": "npm run build:demo && rm -rf ./docs && cp -r packages/demo/www docs && cp -r packages/demo/copy-docs/* docs/ && cp packages/demo/www/index.html docs/404.html"
   },
   "devDependencies": {
     "@stencil/core": "^1.8.0",
