@@ -14,6 +14,7 @@ export namespace Components {
     'mapper': (val: any) => string;
     'name': string;
   }
+  interface QuantumFetch {}
   interface QuantumProvider {
     'name': string;
     'value': any;
@@ -29,6 +30,12 @@ declare global {
     new (): HTMLQuantumConsumerElement;
   };
 
+  interface HTMLQuantumFetchElement extends Components.QuantumFetch, HTMLStencilElement {}
+  var HTMLQuantumFetchElement: {
+    prototype: HTMLQuantumFetchElement;
+    new (): HTMLQuantumFetchElement;
+  };
+
   interface HTMLQuantumProviderElement extends Components.QuantumProvider, HTMLStencilElement {}
   var HTMLQuantumProviderElement: {
     prototype: HTMLQuantumProviderElement;
@@ -36,6 +43,7 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'quantum-consumer': HTMLQuantumConsumerElement;
+    'quantum-fetch': HTMLQuantumFetchElement;
     'quantum-provider': HTMLQuantumProviderElement;
   }
 }
@@ -45,6 +53,7 @@ declare namespace LocalJSX {
     'mapper'?: (val: any) => string;
     'name': string;
   }
+  interface QuantumFetch {}
   interface QuantumProvider {
     'name': string;
     'value'?: any;
@@ -52,6 +61,7 @@ declare namespace LocalJSX {
 
   interface IntrinsicElements {
     'quantum-consumer': QuantumConsumer;
+    'quantum-fetch': QuantumFetch;
     'quantum-provider': QuantumProvider;
   }
 }
@@ -63,6 +73,7 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'quantum-consumer': LocalJSX.QuantumConsumer & JSXBase.HTMLAttributes<HTMLQuantumConsumerElement>;
+      'quantum-fetch': LocalJSX.QuantumFetch & JSXBase.HTMLAttributes<HTMLQuantumFetchElement>;
       'quantum-provider': LocalJSX.QuantumProvider & JSXBase.HTMLAttributes<HTMLQuantumProviderElement>;
     }
   }
