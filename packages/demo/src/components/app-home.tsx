@@ -19,7 +19,7 @@ export class AppHome {
             Check out our docs on <a href='https://stenciljs.com'>stenciljs.com</a> to get started.
           </p>
 
-          <stencil-route-link url='/profile/stencil'>
+          <stencil-route-link url='/profile/quantum'>
             <button class="button is-primary">
               Profile page
             </button>

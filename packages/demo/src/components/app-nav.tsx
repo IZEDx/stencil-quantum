@@ -51,8 +51,8 @@ export class AppNav
                             <stencil-route-link anchorClass="navbar-item" class="navbar-item" url='/' activeClass="is-active" exact={true}>
                                 Home
                             </stencil-route-link>
-                            <stencil-route-link anchorClass="navbar-item" class="navbar-item" url='/profile/stencil' activeClass="is-active">
-                                Stencil
+                            <stencil-route-link anchorClass="navbar-item" class="navbar-item" url='/profile/quantum' activeClass="is-active">
+                                Quantum
                             </stencil-route-link>
                         </div>
                         <div class="navbar-end">
