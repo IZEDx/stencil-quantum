@@ -4,11 +4,11 @@
 
 ## Experience the quantum realm of stencil.
 
-Stencil Quantum is [Stencil]() library enabling inexplicit context access. Think of this like passing props down a quantum tunnel instead of explicitly passing them to each child. During that, Stencil Quantum adheres to the basic principles of Stencil Components where data is always passed down the tree and not up. To push data up the tree, Stencil offers Events, which support event bubbling, enabling events to be emitted up the tree multiple levels and to be listened on inexplicitly using the [Listen]() decorator. Stencil Quantums initial goal was to provide this functionality in the other direction.
+Stencil Quantum is [Stencil](https://stenciljs.com/) library enabling inexplicit context access. Think of this like passing props down a quantum tunnel instead of explicitly passing them to each child. During that, Stencil Quantum adheres to the basic principles of Stencil Components where data is always passed down the tree and not up. To push data up the tree, Stencil offers Events, which support event bubbling, enabling events to be emitted up the tree multiple levels and to be listened on inexplicitly using the [Listen](https://stenciljs.com/docs/events#listen-decorator) decorator. Stencil Quantums initial goal was to provide this functionality in the other direction.
 
 It serves a similar purpose as [stencil-state-tunnel](https://github.com/ionic-team/stencil-state-tunnel) or [stencil-context](https://www.npmjs.com/package/stencil-context), although with less overhead.
 
-Originally Stencil Quantum was intended to be called Stencil Context, however stencil-context was taken on npm just two weeks prior to the first prototype of this library. This, however, turned out to be quite fortunate considering that [stencil-context]() aims to replicate [react-context](), whereas Stencil Quantum takes a more inexplicit approach, which both fit better.
+Originally Stencil Quantum was intended to be called Stencil Context, however stencil-context was taken on npm just two weeks prior to the first prototype of this library. This, however, turned out to be quite fortunate considering that [stencil-context](https://www.npmjs.com/package/stencil-context) aims to replicate [react-context](https://reactjs.org/docs/context.html), whereas Stencil Quantum takes a more inexplicit approach, which both fit better.
 
 ---
 
@@ -47,7 +47,7 @@ There are also some advanced decorators that rely on the context, but provide ex
 
 #### Axios
 
-The axios decorators are property decorators and support [restyped]() schemas as the first type argument to allow the typescript service to suggest urls.
+The axios decorators are property decorators and support [restyped](https://github.com/rawrmaan/restyped) schemas as the first type argument to allow the typescript service to suggest urls.
 
 ##### @Get<Schema>(axiosKey: string, url: string, paramsKey?: string)
 
