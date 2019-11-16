@@ -34,6 +34,8 @@ export class AppProfile
               My name is {this.normalize(this.match.params.name)}. My name was passed in
               through a route param!
             </p>
+            <p>Code of this page:</p>
+            <img src="/assets/profile-code.png"></img>
           </div>
         </section>
       );
