@@ -3,8 +3,7 @@ import { MatchResults } from '@stencil/router';
 import { WatchContext } from "stencil-quantum";
 
 @Component({
-  tag: 'app-profile',
-  styleUrl: 'app-profile.css'
+  tag: 'app-profile'
 })
 export class AppProfile 
 {
@@ -26,14 +25,19 @@ export class AppProfile
   render() {
     if (this.match && this.match.params.name) {
       return (
-        <div class="app-profile">
-          <p>
-            Hello! My name is {this.normalize(this.match.params.name)}. My name was passed in
-            through a route param!
-          </p>
-          <p>
-            I greet you <quantum-consumer name="personToGreet"></quantum-consumer>
-          </p>
+        <div class="segment">
+          <div class="container">
+            <div class="content">
+              <div class="spacer"></div>
+              <h1 class="h1">
+                Hello <quantum-consumer name="personToGreet"></quantum-consumer>!
+              </h1>
+              <p class="p">
+                My name is {this.normalize(this.match.params.name)}. My name was passed in
+                through a route param!
+              </p>
+            </div>
+          </div>
         </div>
       );
     }
