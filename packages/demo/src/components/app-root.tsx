@@ -1,5 +1,5 @@
 import { Component, h, Element, Listen } from '@stencil/core';
-import { Provide, log } from 'stencil-quantum';
+import { Provide, log, ContextError, QuantumError } from 'stencil-quantum';
 
 log.debug = true;
 
@@ -16,6 +16,8 @@ export class AppRoot
 	@Provide() personToGreet = "Your Name";
 	hasCustomName = false;
 	demoNameIndex = -1;
+
+	@ContextError() error!: QuantumError;
 
 	@Listen("changeName")
 	onChangeName({detail}: {detail: string})
@@ -43,6 +45,16 @@ export class AppRoot
 		return (
 			<div>
 				<app-nav></app-nav>
+				{ !this.error ? "" :
+					<section class="section">
+						<div class="container">
+							<div class="notification is-danger">
+								<button class="delete" onClick={() => this.error = undefined}></button>
+								{this.error?.message}
+							</div>
+						</div>
+					</section>
+				}
 				<main>
 					<stencil-router>
 						<stencil-route-switch scrollTopOffset={0}>

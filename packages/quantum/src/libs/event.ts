@@ -1,6 +1,7 @@
 import { Provider } from "./provider";
-import { getEl, hookComponent, ComponentPrototype, throwQuantum } from "./utils";
+import { getEl, hookComponent, ComponentPrototype } from "./utils";
 import { HTMLStencilElement } from "@stencil/core/internal";
+import { throwQuantum } from "./error";
 
 export interface EventEmitter
 {

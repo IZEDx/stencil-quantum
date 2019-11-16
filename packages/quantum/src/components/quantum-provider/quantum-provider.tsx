@@ -1,5 +1,6 @@
 import { Component, h, Prop, Watch, Element } from '@stencil/core';
 import { Provider } from '../../libs/provider';
+import { throwQuantum } from '../../libs';
 
 @Component({
     tag: 'quantum-provider'
@@ -15,13 +16,21 @@ export class QuantumProvider
 
     componentWillLoad()
     {
-        this.provider = Provider.create(this.el, this.name, this.value);
+        try {
+            this.provider = Provider.create(this.el, this.name, this.value);
+        } catch(err) {
+            throwQuantum(this.el, err);
+        }
     }
 
     @Watch("value")
     onValue(val: any)
     {
-        this.provider.provide(val);
+        try {
+            this.provider.provide(val);
+        } catch(err) {
+            throwQuantum(this.el, err);
+        }
     }
 
     render() {

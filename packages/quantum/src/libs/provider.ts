@@ -1,5 +1,6 @@
 import { HTMLStencilElement } from "@stencil/core/internal";
-import { log, QuantumError } from "./utils";
+import { log } from "./utils";
+import { QuantumError } from "./error";
 
 const $providers = Symbol.for("stencil-quantum-providers");
 export type ProvideCallback<T> = (value: T) => void;

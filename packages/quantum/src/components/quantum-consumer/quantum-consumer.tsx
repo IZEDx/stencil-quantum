@@ -1,5 +1,6 @@
 import { Component, Element, Prop, State } from '@stencil/core';
 import { Provider } from '../../libs/provider';
+import { throwQuantum } from '../../libs';
 
 @Component({
     tag: 'quantum-consumer'
@@ -14,8 +15,18 @@ export class QuantumConsumer {
 
     async componentWillLoad()
     {
-        const provider = Provider.find(this.el, this.name);
-        provider.listen(val => this.value = this.mapper(val));
+        try {
+            const provider = Provider.find(this.el, this.name);
+            provider.listen(val => {
+                try {
+                    this.value = this.mapper(val)
+                } catch(err) {
+                    throwQuantum(this.el, err);
+                }
+            });
+        } catch(err) {
+            throwQuantum(this.el, err);
+        }
     }
 
     render() {

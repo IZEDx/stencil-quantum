@@ -1,7 +1,8 @@
 import { Provider } from "./provider";
-import { getEl, hookComponent, ComponentPrototype, log, throwQuantum } from "./utils";
+import { getEl, hookComponent, ComponentPrototype, log } from "./utils";
 import { HTMLStencilElement } from "@stencil/core/internal";
 import { RestypedBase } from "restyped";
+import { throwQuantum } from "./error";
 
 export interface AxiosResponse<T>
 {

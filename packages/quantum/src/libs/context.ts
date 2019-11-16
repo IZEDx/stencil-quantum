@@ -1,5 +1,6 @@
 import { Provider } from "./provider";
-import { getEl, hookComponent, ComponentPrototype, throwQuantum } from "./utils";
+import { getEl, hookComponent, ComponentPrototype } from "./utils";
+import { throwQuantum } from "./error";
 
 export function Provide(key?: string|symbol) 
 { 
@@ -85,7 +86,13 @@ export function WatchContext(key?: string)
 
             try {
                 const provider = Provider.find(el, key!);
-                unlisten = provider.listen(v => method.apply(obj, [v]));
+                unlisten = provider.listen(v => { 
+                    try {
+                        return method.apply(obj, [v]);
+                    } catch(err) {
+                        throwQuantum(el, err);
+                    }
+                });
             } catch(err) {}
 
             return () => {

@@ -1,6 +1,7 @@
 import { Component, Prop, h, Element } from '@stencil/core';
 import { MatchResults } from '@stencil/router';
 import { WatchContext } from "stencil-quantum";
+import { normalize } from '../libs/utils';
 
 @Component({
   tag: 'app-profile'
@@ -15,13 +16,6 @@ export class AppProfile
       console.log("New person to greet", v);
   }
 
-  normalize(name: string): string {
-    if (name) {
-      return name.substr(0, 1).toUpperCase() + name.substr(1).toLowerCase();
-    }
-    return '';
-  }
-
   render() {
     if (this.match && this.match.params.name) {
       return (
@@ -31,11 +25,12 @@ export class AppProfile
               Hello <quantum-consumer name="personToGreet"></quantum-consumer>!
             </h1>
             <p>
-              My name is {this.normalize(this.match.params.name)}. My name was passed in
+              My name is {normalize(this.match.params.name)}. My name was passed in
               through a route param!
             </p>
             <p>Code of this page:</p>
             <img src="/assets/profile-code.png"></img>
+            <quantum-consumer name="this throws an error"></quantum-consumer>!
           </div>
         </section>
       );
