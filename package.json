@@ -9,7 +9,9 @@
     "test": "npm run test:demo & npm run test:quantum",
     "test:quantum": "cd packages/quantum && npm test",
     "test:demo": "cd packages/demo && npm test",
-    "build": "cd packages/quantum && npm run build"
+    "build": "cd packages/quantum && npm run build",
+    "build:demo": "cd packages/demo && npm run build",
+    "build:docs": "npm run build:demo && rm -rf ./docs && cp -r packages/demo/www docs"
   },
   "devDependencies": {
     "@stencil/core": "^1.8.0",
