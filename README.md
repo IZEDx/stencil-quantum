@@ -52,8 +52,63 @@ There are also some advanced decorators that rely on the context, but provide ex
 The axios decorators are property decorators and support [restyped](https://github.com/rawrmaan/restyped) schemas as the first type argument to allow the typescript service to suggest urls.
 
 ##### @Get<Schema>(axiosKey: string, url: string, paramsKey?: string)
+###### Property Decorator
 
 Fetches the given url via and axios instance available in the context on axiosKey. The url can contain path arguments that can be filled in using a params object available in the context on paramsKey, if given. Additional parameters that do not fit in the path will be passed as query arguments.
+
+##### @Put<Schema>(axiosKey: string, url: string, paramsKey?: string, responseKey?: string)
+###### Property Decorator
+
+Put works similar to Get, but sends a PUT request when the property is set witht he value as body. The response will be provided as responseKey, if given. 
+
+##### @Rest<Schema>(axiosKey: string, url: string, paramsKey?: string, responseKey?: string)
+###### Property Decorator
+
+Rest combines Get and Put. It gets the Rest object first and then sends PUT requests when the property set, to update it. Ideally it's able to bind a property to REST object.
+
+#### Error
+
+There is an error handling built into Quantum, that can be leveraged using these decorators. Additional you can throw an error to Quantum using ```throwQuantum(el: HTMLElement, error: Error)```.
+
+##### @Throw()
+###### Property Decorator
+
+Setting this property will throw the value to Quantum.
+
+##### @ContextError()
+###### Property Decorator
+
+Receives Quantum errors thrown at the same or any child elements.
+
+##### @Catch()
+###### Method Decorator
+
+Catches Quantum errors thrown at the same or any child elements.
+
+#### Event
+
+The event decorators allow to interact with abstract EventEmitters in the context. Initially this was made to interact with a Socket.io instance. An abstract EventEmitter looks like this:
+
+```typescript
+export interface EventEmitter
+{
+    emit(event: string, ...args: any[]): EventEmitter;
+    on(event: string, fn: (...args: any[]) => any): EventEmitter;
+    once(event: string, fn: (...args: any[]) => any): EventEmitter;
+    off(event: string, fn: (...args: any[]) => any): EventEmitter;
+}
+```
+
+##### @Emit<T extends EventEmitter>(emitterKey: string, event? Event) // with Event being the name of the event as string
+###### Property Decorator
+
+Emits the given value to the EventEmitter found in the context as emitterKey for the given event name.
+
+
+##### @Receive<T extends EventEmitter>(emitterKey: string, event? Event) // with Event being the name of the event as string
+###### Property Decorator
+
+Updates with values emitted by the EventEmitter found in the context as emitterKey for the event name.
 
 ### Example
 
