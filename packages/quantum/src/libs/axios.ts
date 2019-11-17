@@ -261,6 +261,22 @@ function Http<
     } 
 }
 
+const pathMapping = [
+    {
+        replace: (key: string) => `{${key}}`,
+        with: (value: string) => `${value}`
+    },
+    {
+        replace: (key: string) => `/\\:${key}$`,
+        with: (value: string) => `/${value}`
+    },
+    {
+        replace: (key: string) => `/\\:${key}/`,
+        with: (value: string) => `/${value}/`
+    },
+]
+
+const defaultWith = (value: string) => `${value}`;
 
 function makeQuery(path: string, params?: Record<string, any>)
 {
@@ -268,10 +284,16 @@ function makeQuery(path: string, params?: Record<string, any>)
     let query: Record<string, string> = {};
     if (!!params) {
         for (let [key, value] of Object.entries(params)) {
-            value = `${value}`;
-            if (p.includes(`{${key}}`)) {
-                p = p.replace(new RegExp(`{${key}}`, "g"), escape(value));
-            } else {
+
+            const origP = p;
+            p = pathMapping.reduce((a, m) => {
+                const k = m.replace(key);
+                log("------ Checking ", a, "with", k);
+                return !a.match(new RegExp(k, "g")) ? a 
+                    : a.replace(new RegExp(k, "g"), escape(m.with?.(value) ?? defaultWith(value)));
+            }, p);
+
+            if (p === origP) {
                 query[key] = value;
             }
         }
