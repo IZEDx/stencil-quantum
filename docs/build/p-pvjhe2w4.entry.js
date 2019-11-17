@@ -1,0 +1,1 @@
+import{r as t,g as s}from"./p-80430b56.js";import{b as r,t as a}from"./p-7cabba7d.js";const i=class{constructor(s){t(this,s),this.mapper=t=>`${t}`}async componentWillLoad(){try{r.find(this.el,this.name).listen(t=>{try{this.value=this.mapper(t)}catch(s){a(this.el,s)}})}catch(t){a(this.el,t)}}render(){return this.value}get el(){return s(this)}};export{i as quantum_consumer};
