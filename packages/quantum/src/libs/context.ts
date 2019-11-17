@@ -77,35 +77,40 @@ export function WatchContext(key?: string)
 { 
     return function (prototype: ComponentPrototype, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor
     {
-        key = key || propertyName;
         const method = propertyDesciptor.value;
 
-        hookComponent(prototype, "componentWillLoad", obj => {
+        hookComponent(prototype, "componentWillLoad", obj => 
+        {
             const el = getEl(obj);
             let unlisten = () => {};
+            let resultProvider: Provider<any>;
+            if (key) {
+                resultProvider = Provider.create(el, propertyName, undefined);
+            }
 
-            try {
-                const provider = Provider.find(el, key!);
-                unlisten = provider.listen(v => { 
+            const hookProvider = () => 
+            {
+                const provider = Provider.find(el, key ?? propertyName);
+                provider.listen(v => 
+                { 
                     try {
-                        return method.apply(obj, [v]);
+                        const result = method.apply(obj, [v]);
+                        if (resultProvider) resultProvider.provide(result);
                     } catch(err) {
                         throwQuantum(el, err);
                     }
                 });
+            }
+
+            try {
+                hookProvider();
             } catch(err) {}
 
-            return () => {
+            return () => 
+            {
                 unlisten();
                 try {
-                    const provider = Provider.find(el, key!);
-                    provider.listen(v => { 
-                        try {
-                            return method.apply(obj, [v]);
-                        } catch(err) {
-                            throwQuantum(el, err);
-                        }
-                    });
+                    hookProvider();
                 } catch(err) {
                     throwQuantum(el, err);
                 }
