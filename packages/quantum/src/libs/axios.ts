@@ -28,7 +28,7 @@ export function Rest<
     Schema extends RestypedBase = any, 
     Path extends ValidPath<Schema> = ValidPath<Schema>, 
     Proto extends ValidPrototype<Schema, Path, "GET"> = ValidPrototype<Schema, Path, "GET">
->(axiosKey: string, path: Path, paramsKey?: string, responseKey?: string)
+>(axiosKey: string, path: Path, paramsKey?: string, responseKey?: string, debounceTime = 100)
 { 
     return Http<Schema, Path, "GET", Proto>(axiosKey, path, paramsKey, 
     {
@@ -80,27 +80,29 @@ export function Rest<
             return ctx.value;
         }
         
-    });
+    }, debounceTime);
 } 
 
 export function Get<
     Schema extends RestypedBase = any, 
     Path extends ValidPath<Schema> = ValidPath<Schema>, 
     Proto extends ValidPrototype<Schema, Path, "GET"> = ValidPrototype<Schema, Path, "GET">
->(axiosKey: string, path: Path, paramsKey?: string)
+>(axiosKey: string, path: Path, paramsKey?: string, debounceTime = 100)
 { 
     return Http<Schema, Path, "GET", Proto>(axiosKey, path, paramsKey, 
     {
         onAxios(ctx) {
+            log ("GET onAxios", ctx.params);
             if (!paramsKey || !!ctx.params) ctx.fns!.send!(ctx as any);
         },
 
         onParams(ctx) {
+            log ("GET onParams", ctx.params, ctx.query);
             if (!!ctx.axios) ctx.fns!.send!(ctx as any);
         },
 
         async send(ctx) {
-            log("Sending GET", ctx);
+            log("GET send", ctx);
             const response = await ctx.axios.get(ctx.query.path, {params: ctx.query.params});
             ctx.value = response.data;
             ctx.el.forceUpdate();
@@ -115,14 +117,14 @@ export function Get<
             return ctx.value;
         }
         
-    });
+    }, debounceTime);
 } 
 
 export function Put<
     Schema extends RestypedBase = any, 
     Path extends ValidPath<Schema> = ValidPath<Schema>, 
     Proto extends ValidPrototype<Schema, Path, "PUT"> = ValidPrototype<Schema, Path, "PUT">
->(axiosKey: string, path: Path, paramsKey?: string, responseKey?: string)
+>(axiosKey: string, path: Path, paramsKey?: string, responseKey?: string, debounceTime = 100)
 { 
     return Http<Schema, Path, "PUT", Proto>(axiosKey, path, paramsKey, 
     {
@@ -167,7 +169,7 @@ export function Put<
             return ctx.value;
         }
         
-    });
+    }, debounceTime);
 } 
 
 interface HttpContext<Schema> {
@@ -198,7 +200,7 @@ function Http<
     Path extends ValidPath<Schema> = ValidPath<Schema>, 
     Method extends Methods = "GET",
     Proto extends ValidPrototype<Schema, Path, Method> = ValidPrototype<Schema, Path, Method>
->(axiosKey: string, path: Path, paramsKey: string|undefined, fns: HttpCallbacks<Schema>)
+>(axiosKey: string, path: Path, paramsKey: string|undefined, fns: HttpCallbacks<Schema>, debounceTime = 100)
 { 
     return function (prototype: Proto, propertyName: string)
     {
@@ -232,20 +234,26 @@ function Http<
                         }
                     });        
                     
+                    let debounceHandle: any;
                     if (paramsKey !== undefined)
                     Provider.find<Record<string, any>>(ctx.el!, paramsKey).listen(async p => {
-                        try {
-                            ctx.params = p;
-                            ctx.query = makeQuery(ctx.path as string, ctx.params);
-                            if (ctx.fns && ctx.fns.onParams) await ctx.fns.onParams(ctx);
-                        } catch(err) {
-                            throwQuantum(ctx.el!, err);
-                        }
+                        log("Pre onParams", p);
+                        ctx.params = p;
+                        ctx.query = makeQuery(ctx.path as string, ctx.params);
+
+                        if (debounceHandle) clearTimeout(debounceHandle);
+                        debounceHandle = setTimeout(async () => {
+                            try {
+                                await ctx.fns?.onParams?.(ctx);
+                            } catch(err) {
+                                throwQuantum(ctx.el!, err);
+                            }
+                        }, debounceTime);
                     });
                 } catch(err) {
                     throwQuantum(ctx.el!, err);
                 }
-            }
+            } 
         });
 
         if (delete prototype[propertyName]) 
