@@ -24,6 +24,7 @@ export class Provider<T>
 
     provide(value: T)
     {
+        log("PROVIDING", value, "to", this.listeners);
         this.value = value;
         this.listeners.forEach(cb => cb(value));
         return this;
@@ -34,10 +35,11 @@ export class Provider<T>
         return this.provide(fn(this.retrieve()));
     }
 
-    listen(cb: ProvideCallback<T>)
+    listen(cb: ProvideCallback<T>, updateImmediately = true)
     {
+        log("LISTEN", updateImmediately, this, cb);
         this.listeners = [...this.listeners, cb];
-        cb(this.value);
+        if (updateImmediately) cb(this.value);
         return () => {
             this.listeners = this.listeners.filter(_cb => _cb !== cb);
         }
