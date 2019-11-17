@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "cd packages/quantum && npm start",
-    "demo": "cd packages/demo && npm start",
+    "demo": "(cd packages/quantum && npm run watch) & (cd packages/demo && npm start)",
     "bootstrap": "npx lerna bootstrap",
     "test": "npm run test:demo & npm run test:quantum",
     "test:quantum": "cd packages/quantum && npm test",
@@ -21,6 +21,7 @@
     "jest-cli": "24.9.0",
     "lerna": "latest",
     "puppeteer": "1.20.0",
+    "restyped-axios": "^2.0.0",
     "typescript": "^3.7.2"
   }
 }

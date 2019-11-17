@@ -33,6 +33,7 @@
   },
   "scripts": {
     "build": "cp ../../README.md ./README.md && npm run stencil -- build --docs",
+    "watch": " npm run stencil -- build --watch",
     "start": "npm run stencil -- --dev --watch",
     "test": "npm run stencil -- test --spec --e2e",
     "test.watch": "npm run stencil -- test --spec --e2e --watchAll",
