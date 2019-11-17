@@ -88,10 +88,11 @@ export function WatchContext(key?: string)
                 resultProvider = Provider.create(el, propertyName, undefined);
             }
 
+
             const hookProvider = () => 
             {
                 const provider = Provider.find(el, key ?? propertyName);
-                provider.listen(v => 
+                unlisten = provider.listen(v => 
                 { 
                     try {
                         const result = method.apply(obj, [v]);
