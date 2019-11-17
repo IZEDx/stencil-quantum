@@ -1,5 +1,7 @@
 import { Component, h, Element, Listen } from '@stencil/core';
 import { Provide, log, ContextError, QuantumError } from 'stencil-quantum';
+import axios from "restyped-axios";
+import { APISchema } from '../api.schema';
 
 log.debug = true;
 
@@ -17,9 +19,11 @@ export class AppRoot
 	hasCustomName = false;
 	demoNameIndex = -1;
 
+	@Provide() api = axios.create<APISchema>({baseURL: "/assets/api/"});
+
 	@ContextError() error!: QuantumError;
 
-	@Listen("changeName")
+	@Listen("changeName") 
 	onChangeName({detail}: {detail: string})
 	{
 		console.log("Changing name to: ", detail);
@@ -27,7 +31,7 @@ export class AppRoot
 		this.hasCustomName = true;
 	}
 
-	componentDidLoad()
+	componentDidLoad() 
 	{
 		this.demoNameChanger();
 	}
