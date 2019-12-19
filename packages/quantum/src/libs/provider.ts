@@ -3,39 +3,40 @@ import { log } from "./utils";
 import { QuantumError } from "./error";
 
 const $providers = Symbol.for("stencil-quantum-providers");
-export type ProvideCallback<T> = (value: T) => void;
+export type ProvideCallback<T> = (newvalue: T, oldvalue?: T) => void;
+
+
 
 export class Provider<T>
 {
     listeners = [] as ProvideCallback<T>[];
     hooks = new Map<HTMLStencilElement, Function>();
+    mutable = false;
 
     constructor(public readonly key: string|symbol, private value: T)
     {
-        this.retrieve = this.retrieve.bind(this);
-        this.provide = this.provide.bind(this);
-        this.listen = this.listen.bind(this);
     }
 
-    retrieve(): T
+    retrieve = (): T =>
     {
         return this.value;
     }
 
-    provide(value: T)
+    provide = (value: T) =>
     {
         log("PROVIDING", value, "to", this.listeners);
+        let oldvalue = this.value;
         this.value = value;
-        this.listeners.forEach(cb => cb(value));
+        this.listeners.forEach(cb => cb(value, oldvalue));
         return this;
     }
 
-    update(fn: (v: T) => T)
+    update = (fn: (v: T) => T) =>
     {
         return this.provide(fn(this.retrieve()));
     }
 
-    listen(cb: ProvideCallback<T>, updateImmediately = true)
+    listen = (cb: ProvideCallback<T>, updateImmediately = true) =>
     {
         log("LISTEN", updateImmediately, this, cb);
         this.listeners = [...this.listeners, cb];
@@ -45,7 +46,7 @@ export class Provider<T>
         }
     }
 
-    attach<H extends boolean|undefined>(el: H extends true ? HTMLElement : HTMLStencilElement, noHook?: H)
+    attach = <H extends boolean|undefined>(el: H extends true ? HTMLElement : HTMLStencilElement, noHook?: H) =>
     { 
         log("Add Provider", el, this);
 
@@ -57,19 +58,19 @@ export class Provider<T>
         return noHook ? this : this.hook(el as any);
     }
 
-    isHooked(el: HTMLStencilElement)
+    isHooked = (el: HTMLStencilElement) =>
     {
         return this.hooks.has(el);
     }
 
-    hook(el: HTMLStencilElement)
+    hook = (el: HTMLStencilElement) =>
     {
         log("Hook Provider", el, this);
         this.hooks.set(el, this.listen(() => el.forceUpdate()));
         return this;
     }
 
-    unhook(el: HTMLStencilElement)
+    unhook = (el: HTMLStencilElement) =>
     {
         log("Unhook Provider", el, this);
         if (this.isHooked(el)) {
@@ -78,11 +79,21 @@ export class Provider<T>
         }
         return this;
     }
-    
-    static find<T>(el: HTMLElement, key: string|symbol): Provider<T>
+
+    /**
+     * Creates a predicate, that filters providers matching a key and having no namespace or being 
+     * @param key 
+     * @param namespace 
+     */
+    static makeFilter(key: string|symbol, namespace?: string) 
     {
-        log("Searching Provider", key, el);
-        const providers = Provider.getAttached(el).filter(p => p.key === key);
+        return (p: Provider<any>) => p.key === key || (namespace && typeof key === "string" && p.key === namespace + "__" + key);
+    } 
+
+    static find<T>(el: HTMLElement, key: string|symbol, namespace?: string): Provider<T>
+    {
+        log("Searching Provider", key, namespace,  el);
+        const providers = Provider.getAttached(el).filter(Provider.makeFilter(key, namespace));
 
         if (providers.length > 1) {
             throw new QuantumError(`Found multiple "${String(key)}" providers on the same object!`);
@@ -98,11 +109,12 @@ export class Provider<T>
             throw new QuantumError(`No provider in hierarchy found that matches "${String(key)}"!`);
         }
         
-        return Provider.find<T>(parent, key).attach(el, true); // Attach reference to this el to make lookup for children shorter
+        return Provider.find<T>(parent, key, namespace).attach(el, true); // Attach reference to this el to make lookup for children shorter
     }
 
-    static create<T>(el: HTMLStencilElement, key: string|symbol, value: T): Provider<T>
+    static create<T>(el: HTMLStencilElement, key: string|symbol, value: T, namespace?: string): Provider<T>
     {
+        if (typeof key === "string") key = (namespace ? namespace + "__" : "") + key;
         log("Create Provider", el, key, value);
         return new Provider(key, value).attach(el);
     }

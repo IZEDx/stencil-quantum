@@ -2,15 +2,29 @@ import { Provider } from "./provider";
 import { getEl, hookComponent, ComponentPrototype } from "./utils";
 import { throwQuantum } from "./error";
 
-export function Provide(key?: string|symbol) 
+export interface BaseOptions
+{
+    on?: string|symbol;
+    namespace?: string;
+}
+
+export interface ContextOptions extends BaseOptions 
+{
+    mutable?: boolean;
+}
+
+export function Provide(opts?: ContextOptions) 
 { 
     return function (prototype: ComponentPrototype, propertyName: string)
     {
-        key = key || propertyName;
-        const provider = new Provider(key, prototype[propertyName]);
+        const key = opts?.on ?? propertyName;
+        let provider: Provider<any>;
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
+            provider = Provider.create(el, key, prototype[propertyName], opts?.namespace);
+            provider.mutable = !!opts?.mutable;
+
             try {
                 provider.attach(el);
                 provider.hook(el);
@@ -23,8 +37,8 @@ export function Provide(key?: string|symbol)
         {
             Object.defineProperty(prototype, propertyName, 
             {
-                get: provider.retrieve,
-                set: provider.provide,
+                get: () => provider.retrieve(),
+                set: (v: any) => provider.provide(v),
                 enumerable: true,
                 configurable: true
             });
@@ -32,28 +46,29 @@ export function Provide(key?: string|symbol)
     } 
 }
 
-export function Context(key?: string) 
+export function Context(opts?: ContextOptions) 
 { 
     return function (prototype: ComponentPrototype, propertyName: string)
     {
-        key = key || propertyName;
-        let provider: Provider<any>;
+        const key = opts?.on ?? propertyName;
+        let provider: Provider<any>|undefined;
         let defaultValue: any;
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
 
             try {
-                provider = Provider.find(el, key!);
+                provider = Provider.find(el, key, opts?.namespace);
                 provider.hook(el);
             } catch(err) {
             }
 
             return () => {
                 try {
-                    if (provider) provider.unhook(el);
-                    provider = Provider.find(el, key!);
-                    provider.hook(el);
+                    if (!provider) {
+                        provider = Provider.find(el, key, opts?.namespace);
+                        provider.hook(el);
+                    }
                 } catch(err) {
                     throwQuantum(el, err);
                 }
@@ -64,8 +79,14 @@ export function Context(key?: string)
         {
             Object.defineProperty(prototype, propertyName, 
             {
-                get: () => (provider && provider.retrieve()) || defaultValue,
-                set: v => defaultValue = v,
+                get: () => provider?.retrieve() ?? defaultValue,
+                set: v => {
+                    if (opts?.mutable && provider?.mutable) {
+                        provider.provide(v);
+                    } else {
+                        defaultValue = v;
+                    }
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -73,7 +94,7 @@ export function Context(key?: string)
     } 
 }
 
-export function WatchContext(key?: string) 
+export function Observe(opts?: BaseOptions) 
 { 
     return function (prototype: ComponentPrototype, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor
     {
@@ -83,20 +104,14 @@ export function WatchContext(key?: string)
         {
             const el = getEl(obj);
             let unlisten = () => {};
-            let resultProvider: Provider<any>;
-            if (key) {
-                resultProvider = Provider.create(el, propertyName, undefined);
-            }
-
 
             const hookProvider = () => 
             {
-                const provider = Provider.find(el, key ?? propertyName);
+                const provider = Provider.find(el, opts?.on ?? propertyName, opts?.namespace);
                 unlisten = provider.listen(v => 
                 { 
                     try {
-                        const result = method.apply(obj, [v]);
-                        if (resultProvider) resultProvider.provide(result);
+                        method.apply(obj, [v]);
                     } catch(err) {
                         throwQuantum(el, err);
                     }
@@ -114,6 +129,69 @@ export function WatchContext(key?: string)
                     hookProvider();
                 } catch(err) {
                     throwQuantum(el, err);
+                }
+            }
+        });
+
+        return propertyDesciptor;
+    } 
+}
+
+export interface ReactOptions {
+    on: string;
+    provide?: string;
+    namespace?: string;
+    mutable?: boolean;
+}
+
+/**
+ * Watch a context 
+ * @param {ReactOptions} opts 
+ */
+export function React(opts: ReactOptions) 
+{ 
+    return function (prototype: ComponentPrototype, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor
+    {
+        const method = propertyDesciptor.value;
+
+        hookComponent(prototype, "componentWillLoad", obj => 
+        {
+            const el = getEl(obj);
+            let unlisten = () => {};
+            const resultProvider = Provider.create(el, opts.provide ?? propertyName, undefined, opts.namespace);
+            resultProvider.mutable = !!opts.mutable;
+
+            const hookProvider = () => 
+            {
+                const provider = Provider.find(el, opts.on);
+                unlisten = provider.listen(v => 
+                { 
+                    try {
+                        const result = method.apply(obj, [v]);
+                        if (resultProvider) resultProvider.provide(result);
+                    } catch(err) {
+                        throwQuantum(el, err);
+                    }
+                });
+            }
+
+            let retry = false;
+            try {
+                hookProvider();
+            } catch(err) {
+                retry = true;
+            }
+
+            return () => 
+            {
+                if (retry)
+                {
+                    unlisten();
+                    try {
+                        hookProvider();
+                    } catch(err) {
+                        throwQuantum(el, err);
+                    }
                 }
             }
         });
