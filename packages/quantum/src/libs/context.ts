@@ -18,7 +18,7 @@ export function Provide(opts?: ContextOptions)
     return function (prototype: ComponentPrototype, propertyName: string)
     {
         const key = opts?.on ?? propertyName;
-        let provider: Provider<any>;
+        let provider: Provider<any>|undefined;
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
@@ -37,8 +37,8 @@ export function Provide(opts?: ContextOptions)
         {
             Object.defineProperty(prototype, propertyName, 
             {
-                get: () => provider.retrieve(),
-                set: (v: any) => provider.provide(v),
+                get: () => provider?.retrieve(),
+                set: (v: any) => provider?.provide(v),
                 enumerable: true,
                 configurable: true
             });
