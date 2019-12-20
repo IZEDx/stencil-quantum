@@ -13,15 +13,15 @@
     "build:docs": "npm run build:demo && rm -rf ./docs && cp -r packages/demo/www docs && cp -r packages/demo/copy-docs/* docs/ && cp packages/demo/www/index.html docs/404.html"
   },
   "devDependencies": {
-    "@stencil/core": "^1.8.0",
+    "@stencil/core": "^1.8.2",
     "@stencil/router": "latest",
-    "@types/jest": "24.0.23",
-    "@types/puppeteer": "1.20.2",
+    "@types/jest": "24.0.24",
+    "@types/puppeteer": "2.0.0",
     "jest": "24.9.0",
     "jest-cli": "24.9.0",
     "lerna": "latest",
-    "puppeteer": "1.20.0",
+    "puppeteer": "2.0.0",
     "restyped-axios": "^2.0.0",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.3"
   }
 }
