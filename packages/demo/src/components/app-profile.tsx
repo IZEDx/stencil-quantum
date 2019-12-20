@@ -1,6 +1,6 @@
 import { Component, Prop, h, Element } from '@stencil/core';
 import { MatchResults } from '@stencil/router';
-import { WatchContext } from "stencil-quantum";
+import { Observe } from "stencil-quantum";
 import { normalize } from '../libs/utils';
 
 @Component({
@@ -11,7 +11,7 @@ export class AppProfile
   @Element() el!: HTMLAppProfileElement;
   @Prop() match: MatchResults;
 
-  @WatchContext()
+  @Observe()
   personToGreet(v: string) {
       console.log("New person to greet", v);
   }

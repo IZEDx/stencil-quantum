@@ -1,5 +1,5 @@
 import { Component, h, Element } from '@stencil/core';
-import { Context, WatchContext, Get } from 'stencil-quantum';
+import { Context, React, Get } from 'stencil-quantum';
 import { APISchema } from '../api.schema';
 
 @Component({
@@ -10,13 +10,13 @@ export class AppHome {
 
   @Context() personToGreet = "";
 
-  @WatchContext("personToGreet")
+  @React({ on: "personToGreet", provide: "userRequest" })
   prepareUserRequest()
   {
     return { id: this.personToGreet.toLowerCase() + ".json" }
   }
-
-  @Get<APISchema>("api", "/user/:id", "prepareUserRequest") user = { name: "Guest" };
+  
+  @Get<APISchema>({ url: "/user/:id",  axios: "api",  params: "userRequest" }) user = { name: "Guest" };
 
   render() {
     return (
