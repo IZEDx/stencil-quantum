@@ -20,30 +20,38 @@ export interface AxiosInstance
 }
 
 type Methods = "GET"|"POST"|"PUT"|"DELETE";
-type ValidPrototype<Schema extends RestypedBase, Path extends ValidPath<Schema>, Method extends Methods> = 
+type ValidPrototype<Schema extends RestypedBase, Path extends ValidUrl<Schema>, Method extends Methods> = 
     Schema[Path][Method] extends undefined ? never : ComponentPrototype;
-type ValidPath<Schema extends RestypedBase> = Schema extends RestypedBase ? keyof Schema : string;
+type ValidUrl<Schema extends RestypedBase> = Schema extends RestypedBase ? keyof Schema : string;
 
-export function Rest<
-    Schema extends RestypedBase = any, 
-    Path extends ValidPath<Schema> = ValidPath<Schema>, 
-    Proto extends ValidPrototype<Schema, Path, "GET"> = ValidPrototype<Schema, Path, "GET">
->(axiosKey: string, path: Path, paramsKey?: string, responseKey?: string, debounceTime = 100)
+
+export interface AxiosOptions<Schema extends RestypedBase = any>
+{
+    axios?: string;
+    url: ValidUrl<Schema>;
+    params?: string;
+    namespace?: string;
+    debounce?: number;
+    provide?: string;
+}
+
+export function Rest<Schema>(opts: AxiosOptions<Schema>)
 { 
-    return Http<Schema, Path, "GET", Proto>(axiosKey, path, paramsKey, 
-    {
+    return Http<Schema>({
+        ...opts,
+
         init(ctx) {
             ctx.sendNext = false;
         },
 
         onComponent(ctx) {
-            if (responseKey !== undefined) {
-                ctx.responseProvider = Provider.create(ctx.el!, responseKey!, undefined);
+            if (opts.provide !== undefined) {
+                ctx.responseProvider = Provider.create(ctx.el!, opts.provide!, undefined, opts.namespace);
             }
         },
 
         onAxios(ctx) {
-            if (!paramsKey || !!ctx.params) ctx.fns!.send!(ctx as any);
+            if (!opts.params || !!ctx.params) ctx.fns!.send!(ctx as any);
         },
 
         onParams(ctx) {
@@ -69,7 +77,7 @@ export function Rest<
             ctx.value = value;
 
             ctx.sendNext = true;
-            if (!!ctx.axios && (!paramsKey || !!ctx.params)) {
+            if (!!ctx.axios && (!opts.params || !!ctx.params)) {
                 ctx.fns!.send!(ctx as any);
             }
 
@@ -80,20 +88,24 @@ export function Rest<
             return ctx.value;
         }
         
-    }, debounceTime);
+    });
 } 
 
-export function Get<
-    Schema extends RestypedBase = any, 
-    Path extends ValidPath<Schema> = ValidPath<Schema>, 
-    Proto extends ValidPrototype<Schema, Path, "GET"> = ValidPrototype<Schema, Path, "GET">
->(axiosKey: string, path: Path, paramsKey?: string, debounceTime = 100)
+
+export function Get<Schema>(opts: AxiosOptions<Schema>)
 { 
-    return Http<Schema, Path, "GET", Proto>(axiosKey, path, paramsKey, 
-    {
+    return Http<Schema>({
+        ...opts,
+
+        onComponent(ctx) {
+            if (opts.provide !== undefined) {
+                ctx.provider = Provider.create(ctx.el!, opts.provide!, undefined, opts.namespace);
+            }
+        },
+
         onAxios(ctx) {
             log ("GET onAxios", ctx.params);
-            if (!paramsKey || !!ctx.params) ctx.fns!.send!(ctx as any);
+            if (!opts.params || !!ctx.params) ctx.fns!.send!(ctx as any);
         },
 
         onParams(ctx) {
@@ -117,29 +129,26 @@ export function Get<
             return ctx.value;
         }
         
-    }, debounceTime);
+    });
 } 
 
-export function Put<
-    Schema extends RestypedBase = any, 
-    Path extends ValidPath<Schema> = ValidPath<Schema>, 
-    Proto extends ValidPrototype<Schema, Path, "PUT"> = ValidPrototype<Schema, Path, "PUT">
->(axiosKey: string, path: Path, paramsKey?: string, responseKey?: string, debounceTime = 100)
+export function Put<Schema>(opts: AxiosOptions<Schema>)
 { 
-    return Http<Schema, Path, "PUT", Proto>(axiosKey, path, paramsKey, 
-    {
+    return Http<Schema>({
+        ...opts,
+
         init(ctx) {
             ctx.onReady = () => {};
         },
 
         onComponent(ctx) {
-            if (responseKey !== undefined) {
-                ctx.responseProvider = Provider.create(ctx.el!, responseKey!, undefined);
+            if (opts.provide !== undefined) {
+                ctx.responseProvider = Provider.create(ctx.el!, opts.provide, undefined);
             }
         },
 
         onAxios(ctx) {
-            if (!paramsKey || !!ctx.params) ctx.onReady();
+            if (!opts.params || !!ctx.params) ctx.onReady();
         },
 
         onParams(ctx) {
@@ -156,20 +165,20 @@ export function Put<
     
         setValue(value, ctx) {
             ctx.value = value;
-            if (!!ctx.axios && (!paramsKey || !!ctx.params)) {
+            if (!!ctx.axios && (!opts.params || !!ctx.params)) {
                 ctx.fns!.send!(ctx as any);
             } else {
                 ctx.onReady = () => ctx.fns!.send!(ctx as any);
             }
             
-            if (ctx.el) ctx.el.forceUpdate();
+            ctx.el?.forceUpdate();
         },
 
         getValue(ctx) {
             return ctx.value;
         }
         
-    }, debounceTime);
+    });
 } 
 
 interface HttpContext<Schema> {
@@ -179,7 +188,7 @@ interface HttpContext<Schema> {
     value: any;
     el: HTMLStencilElement;
     axios: AxiosInstance;
-    path: ValidPath<Schema>;
+    url: ValidUrl<Schema>;
     params?: Record<string, any>;
     fns: HttpCallbacks<Schema>;
     [key: string]: any;
@@ -195,48 +204,45 @@ interface HttpCallbacks<Schema> {
     onParams?(ctx: Partial<HttpContext<Schema>>): void|Promise<void>;
 }
 
-function Http<
-    Schema extends RestypedBase = any, 
-    Path extends ValidPath<Schema> = ValidPath<Schema>, 
-    Method extends Methods = "GET",
-    Proto extends ValidPrototype<Schema, Path, Method> = ValidPrototype<Schema, Path, Method>
->(axiosKey: string, path: Path, paramsKey: string|undefined, fns: HttpCallbacks<Schema>, debounceTime = 100)
+export type HttpOptions<Schema> = AxiosOptions<Schema> & HttpCallbacks<Schema>;
+
+function Http<Schema, Method extends Methods = "GET">(opts: HttpOptions<Schema>)
 { 
-    return function (prototype: Proto, propertyName: string)
+    return function (prototype: ValidPrototype<Schema, ValidUrl<Schema>, Method>, propertyName: string)
     {
         const ctx: Partial<HttpContext<Schema>> = {
             proto: prototype,
             propertyName,
             value: prototype[propertyName],
-            path,
-            fns,
-            query: makeQuery(path as string)
+            url: opts.url,
+            fns: opts,
+            query: makeQuery(opts.url as string)
         };
-        if (ctx.fns!.init) ctx.fns!.init(ctx);
+        ctx.fns?.init?.(ctx);
 
         hookComponent(prototype, "componentWillLoad", async obj => {
             ctx.obj = obj;
             ctx.el = getEl(ctx.obj);          
             try {
-                if (ctx.fns!.onComponent) await ctx.fns!.onComponent(ctx);
+                await ctx.fns?.onComponent?.(ctx);
             } catch(err) {
                 throwQuantum(ctx.el!, err);
             }
 
             return () => {
                 try {
-                    Provider.find<AxiosInstance>(ctx.el!, axiosKey).listen(async a => {
+                    Provider.find<AxiosInstance>(ctx.el!, opts.axios ?? "axios", opts.namespace).listen(async a => {
                         try {
                             ctx.axios = a;
-                            if (ctx.fns && ctx.fns.onAxios) await ctx.fns.onAxios(ctx);
+                            await ctx.fns?.onAxios?.(ctx);
                         } catch(err) {
                             throwQuantum(ctx.el!, err);
                         }
                     });        
                     
                     let debounceHandle: any;
-                    if (paramsKey !== undefined)
-                    Provider.find<Record<string, any>>(ctx.el!, paramsKey).listen(async p => {
+                    if (opts.params !== undefined)
+                    Provider.find<Record<string, any>>(ctx.el!, opts.params, opts.namespace).listen(async p => {
                         log("Pre onParams", p);
                         ctx.params = p;
                         ctx.query = makeQuery(ctx.path as string, ctx.params);
@@ -248,7 +254,7 @@ function Http<
                             } catch(err) {
                                 throwQuantum(ctx.el!, err);
                             }
-                        }, debounceTime);
+                        }, opts.debounce ?? 100);
                     });
                 } catch(err) {
                     throwQuantum(ctx.el!, err);

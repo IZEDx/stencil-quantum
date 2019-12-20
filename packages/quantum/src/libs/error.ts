@@ -26,7 +26,12 @@ export function throwQuantum(el: HTMLStencilElement, error: string|Error)
     }
 }
 
-export function Throw() 
+export interface ErrorOptions
+{
+    namespace?: string;
+}
+
+export function Throw(opts?: ErrorOptions) 
 { 
     return function (prototype: ComponentPrototype, propertyName: string)
     {
@@ -35,7 +40,7 @@ export function Throw()
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
             try {
-                provider = Provider.find<QuantumError>(el, $error);
+                provider = Provider.find<QuantumError>(el, $error, opts?.namespace);
                 provider.attach(el);
                 provider.hook(el);
             } catch(err) {
@@ -56,14 +61,16 @@ export function Throw()
     } 
 }
 
-export function ContextError() 
+export function ContextError(opts?: ErrorOptions) 
 { 
     return function (prototype: ComponentPrototype, propertyName: string)
     {
-        const provider = new Provider($error, prototype[propertyName]);
+        let provider: Provider<any>;
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
+            provider = Provider.create(el, $error, prototype[propertyName], opts?.namespace);
+
             try {
                 provider.attach(el);
                 provider.hook(el);
@@ -76,8 +83,8 @@ export function ContextError()
         {
             Object.defineProperty(prototype, propertyName, 
             {
-                get: provider.retrieve,
-                set: provider.provide,
+                get: () => provider.retrieve(),
+                set: (v: any) => provider.provide(v),
                 enumerable: true,
                 configurable: true
             });
@@ -85,21 +92,27 @@ export function ContextError()
     } 
 }
 
-export function Catch() 
+export interface CatchOptions extends ErrorOptions
+{
+    provide?: string;
+}
+
+export function Catch(opts?: CatchOptions) 
 { 
     return function (prototype: ComponentPrototype, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor
     {
-        const method = propertyDesciptor.value;
-        const provider = new Provider($error, prototype[propertyName]);
-
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
+            const provider = Provider.create(el, $error, undefined, opts?.namespace)
+            const responseProvider = opts?.provide ? Provider.create(el, opts.provide, undefined, opts.namespace) : undefined;
 
             try {
                 provider.attach(el);
-                provider.listen(v => { 
+                responseProvider?.attach(el);
+                provider.listen(async v => { 
                     try {
-                        return method.apply(obj, [v]);
+                        const response = await propertyDesciptor.value?.apply(obj, [v]);
+                        responseProvider?.provide(response);
                     } catch(err) {
                         throwQuantum(el, err);
                     }

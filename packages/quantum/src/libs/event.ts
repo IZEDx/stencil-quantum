@@ -13,24 +13,30 @@ export interface EventEmitter
 
 type EmitEvents<T> = T extends EventEmitter ? Parameters<T["emit"]>[0] : string;
 
+export interface EventOptions<E extends string|undefined>
+{
+    emitter: string;
+    namespace?: string;
+    on?: E
+}
+
 export function Emit<
     T extends EventEmitter = any, 
-    E extends EmitEvents<T> = EmitEvents<T>, 
-    Event extends E|undefined = E|undefined
->(emitterKey: string, event?: Event) 
+    E extends EmitEvents<T>|undefined = any
+>(opts: EventOptions<E>) 
 { 
-    return function (prototype: ComponentPrototype, propertyName: Event extends E ? string : E)
+    return function (prototype: ComponentPrototype, propertyName: E extends EmitEvents<T> ? string : E)
     {
-        const _event = event || propertyName;
+        const _event = opts.on ?? propertyName!;
         let provider: Provider<EventEmitter>;
-        let value: any = prototype[propertyName];
+        let value: any = prototype[propertyName as string];
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
             
             try {
-                provider = Provider.find(el, emitterKey);
-                if (value) provider.retrieve().emit(_event!, value);
+                provider = Provider.find(el, opts.emitter, opts.namespace);
+                if (value) provider.retrieve().emit(_event, value);
                 provider.hook(el);
             } catch(err) {
                 
@@ -39,7 +45,7 @@ export function Emit<
             return () => {
                 try {
                     if (provider) provider.unhook(el);
-                    provider = Provider.find(el, emitterKey);
+                    provider = Provider.find(el, opts.emitter);
                     if (value) provider.retrieve().emit(_event!, value);
                     provider.hook(el);
                 } catch(err) {
@@ -48,15 +54,13 @@ export function Emit<
             }
         });
 
-        if (delete prototype[propertyName]) 
+        if (delete prototype[propertyName as string]) 
         {
-            Object.defineProperty(prototype, propertyName, 
+            Object.defineProperty(prototype, propertyName as string, 
             {
                 get: () => value,
                 set: (v: any) => {
-                    if (provider) {
-                        provider.retrieve().emit(_event!, v);
-                    }
+                    provider?.retrieve().emit(_event!, v);
                     value = v;
                 },
                 enumerable: true,
@@ -70,54 +74,48 @@ type ReceiveEvents<T> = T extends EventEmitter ? Parameters<T["on"]>[0] : string
 
 export function Receive<
     T extends EventEmitter = any, 
-    E extends ReceiveEvents<T> = ReceiveEvents<T>, 
-    Event extends E|undefined = E|undefined
->(emitterKey: string, event?: Event) 
+    E extends ReceiveEvents<T>|undefined = any
+>(opts: EventOptions<E>) 
 { 
-    return function (prototype: ComponentPrototype, propertyName: Event extends E ? string : E)
+    return function (prototype: ComponentPrototype, propertyName: E extends ReceiveEvents<T> ? string : E)
     {
-        const _event = event || propertyName;
+        const _event = opts.on ?? propertyName!;
         let el: HTMLStencilElement;
         let value: any = prototype[propertyName as string];
 
         const onValue = (v: any) => {
             value = v;
-            if (el) el.forceUpdate();
+            el?.forceUpdate();
         };
 
         hookComponent(prototype, "componentWillLoad", obj => {
             let provider: Provider<any>;
             let lastEmitter: EventEmitter;
-            let unlisten = () => {};
             el = getEl(obj);
 
-            try {
-                provider = Provider.find(el, emitterKey);
-                provider.listen(emitter => {
-                    if (lastEmitter) lastEmitter.off(_event!, onValue);
-                    emitter.on(_event!, onValue);
-                });
-            } catch(err) {
-
-            }
-            
-            return () => {
+            const findAndListen = (onErr = (e: any) => {}) => {
                 try {
-                    if (provider) unlisten();
-                    provider = Provider.find<EventEmitter>(el, emitterKey!);
-                    provider.listen(emitter => {
-                        if (lastEmitter) lastEmitter.off(_event!, onValue);
-                        emitter.on(_event!, onValue);
-                    });
+                    if (!provider) {
+                        provider = Provider.find<EventEmitter>(el, opts.emitter, opts.namespace);
+                        provider.listen(emitter => {
+                            lastEmitter?.off(_event, onValue);
+                            emitter.on(_event, onValue);
+                            lastEmitter = emitter;
+                        });
+                    }
                 } catch(err) {
-                    throwQuantum(el!, err);
+                    onErr(err);
                 }
             }
+
+            findAndListen();
+            
+            return () => findAndListen(err => throwQuantum(el!, err));
         });
 
-        if (delete prototype[propertyName]) 
+        if (delete prototype[propertyName as string]) 
         {
-            Object.defineProperty(prototype, propertyName, 
+            Object.defineProperty(prototype, propertyName as string, 
             {
                 get: () => value,
                 set: onValue,
