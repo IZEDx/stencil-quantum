@@ -19,10 +19,11 @@ export function Provide(opts?: ContextOptions)
     {
         const key = opts?.on ?? propertyName;
         let provider: Provider<any>|undefined;
+        let defaultValue: any;
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
-            provider = Provider.create(el, key, prototype[propertyName], opts?.namespace);
+            provider = Provider.create(el, key, defaultValue, opts?.namespace);
             provider.mutable = !!opts?.mutable;
 
             try {
@@ -38,7 +39,13 @@ export function Provide(opts?: ContextOptions)
             Object.defineProperty(prototype, propertyName, 
             {
                 get: () => provider?.retrieve(),
-                set: (v: any) => provider?.provide(v),
+                set: (v: any) => { 
+                    if (provider) {
+                        provider.provide(v);
+                    } else {
+                        defaultValue = v;
+                    }
+                },
                 enumerable: true,
                 configurable: true
             });

@@ -15,8 +15,10 @@
   "devDependencies": {
     "@stencil/core": "^1.8.2",
     "@stencil/router": "latest",
+    "@types/dompurify": "^2.0.0",
     "@types/jest": "24.0.24",
     "@types/puppeteer": "2.0.0",
+    "dompurify": "^2.0.7",
     "jest": "24.9.0",
     "jest-cli": "24.9.0",
     "lerna": "latest",

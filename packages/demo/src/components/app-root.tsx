@@ -9,6 +9,7 @@ const demoNames = [
 	"Alice", "Bob", "Cindy", "Danny", "Erica", "Felix"
 ]
 
+
 @Component({
  	tag: 'app-root'
 })
@@ -18,7 +19,7 @@ export class AppRoot
 	@Provide() personToGreet = "Your Name";
 	hasCustomName = false;
 	demoNameIndex = -1;
-
+	wtf = axios.create<APISchema>({baseURL: "/assets/api/"});
 	@Provide() api = axios.create<APISchema>({baseURL: "/assets/api/"});
 
 	@ContextError() error!: QuantumError;
@@ -33,6 +34,8 @@ export class AppRoot
 
 	componentDidLoad() 
 	{
+		console.log("XXXXX MY FUCKING API", this.wtf);
+		console.log("XXXXX MY BROKEN MESS", this.api);
 		this.demoNameChanger();
 	}
 

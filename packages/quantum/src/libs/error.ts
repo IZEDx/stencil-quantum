@@ -65,7 +65,7 @@ export function ContextError(opts?: ErrorOptions)
 { 
     return function (prototype: ComponentPrototype, propertyName: string)
     {
-        let provider: Provider<any>;
+        let provider: Provider<any>|undefined;
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
@@ -83,13 +83,13 @@ export function ContextError(opts?: ErrorOptions)
         {
             Object.defineProperty(prototype, propertyName, 
             {
-                get: () => provider.retrieve(),
-                set: (v: any) => provider.provide(v),
+                get: () => provider?.retrieve(),
+                set: (v: any) => provider?.provide(v),
                 enumerable: true,
                 configurable: true
             });
         }
-    } 
+    }  
 }
 
 export interface CatchOptions extends ErrorOptions

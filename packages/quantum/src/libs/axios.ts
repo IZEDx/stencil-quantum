@@ -33,10 +33,12 @@ export interface AxiosOptions<Schema extends RestypedBase = any>
     namespace?: string;
     debounce?: number;
     provide?: string;
+    lazy?: boolean;
 }
 
 export function Rest<Schema>(opts: AxiosOptions<Schema>)
 { 
+    opts.lazy = opts.lazy ?? true;
     return Http<Schema>({
         ...opts,
 
@@ -51,7 +53,10 @@ export function Rest<Schema>(opts: AxiosOptions<Schema>)
         },
 
         onAxios(ctx) {
-            if (!opts.params || !!ctx.params) ctx.fns!.send!(ctx as any);
+            if (!opts.params || !!ctx.params) {
+                const promise = ctx.fns!.send!(ctx as any);
+                if (!opts.lazy) return promise;
+            }
         },
 
         onParams(ctx) {
@@ -70,7 +75,8 @@ export function Rest<Schema>(opts: AxiosOptions<Schema>)
             log("Sending Rest GET", ctx);
             const response = await ctx.axios.get(ctx.query.path, {params: ctx.query.params});
             ctx.value = response.data;
-            ctx.el.forceUpdate();
+            if (opts.lazy || !ctx.first) ctx.el.forceUpdate();
+            if (!ctx.first) ctx.first = true;
         },
     
         setValue(value, ctx) {
@@ -94,6 +100,7 @@ export function Rest<Schema>(opts: AxiosOptions<Schema>)
 
 export function Get<Schema>(opts: AxiosOptions<Schema>)
 { 
+    opts.lazy = opts.lazy ?? true;
     return Http<Schema>({
         ...opts,
 
@@ -104,8 +111,11 @@ export function Get<Schema>(opts: AxiosOptions<Schema>)
         },
 
         onAxios(ctx) {
-            log ("GET onAxios", ctx.params);
-            if (!opts.params || !!ctx.params) ctx.fns!.send!(ctx as any);
+            log ("GET onAxios", ctx.axios, ctx.params);
+            if (!opts.params || !!ctx.params) {
+                const promise = ctx.fns!.send!(ctx as any);
+                if (!opts.lazy) return promise;
+            }
         },
 
         onParams(ctx) {
@@ -115,14 +125,17 @@ export function Get<Schema>(opts: AxiosOptions<Schema>)
 
         async send(ctx) {
             log("GET send", ctx);
-            const response = await ctx.axios.get(ctx.query.path, {params: ctx.query.params});
-            ctx.value = response.data;
-            ctx.el.forceUpdate();
+            const response = await ctx.axios?.get(ctx.query.path, {params: ctx.query.params});
+            ctx.value = response?.data;
+            if (ctx.provider) ctx.provider.provide(response.data);
+            else if(opts.lazy || !ctx.first) ctx.el?.forceUpdate();
+            if (!ctx.first) ctx.first = true;
         },
     
         setValue(value, ctx) {
             ctx.value = value;
-            if (ctx.el) ctx.el.forceUpdate();
+            if (ctx.provider) ctx.provider.provide(value);
+            else if (ctx.el) ctx.el.forceUpdate();
         },
 
         getValue(ctx) {
@@ -134,6 +147,7 @@ export function Get<Schema>(opts: AxiosOptions<Schema>)
 
 export function Put<Schema>(opts: AxiosOptions<Schema>)
 { 
+    opts.lazy = opts.lazy ?? true;
     return Http<Schema>({
         ...opts,
 
@@ -148,7 +162,10 @@ export function Put<Schema>(opts: AxiosOptions<Schema>)
         },
 
         onAxios(ctx) {
-            if (!opts.params || !!ctx.params) ctx.onReady();
+            if (!opts.params || !!ctx.params) {
+                const promise = ctx.onReady();
+                if (!opts.lazy) return promise;
+            }
         },
 
         onParams(ctx) {
@@ -229,33 +246,40 @@ function Http<Schema, Method extends Methods = "GET">(opts: HttpOptions<Schema>)
                 throwQuantum(ctx.el!, err);
             }
 
-            return () => {
+            return async () => {
                 try {
-                    Provider.find<AxiosInstance>(ctx.el!, opts.axios ?? "axios", opts.namespace).listen(async a => {
-                        try {
-                            ctx.axios = a;
-                            await ctx.fns?.onAxios?.(ctx);
-                        } catch(err) {
-                            throwQuantum(ctx.el!, err);
-                        }
-                    });        
-                    
-                    let debounceHandle: any;
-                    if (opts.params !== undefined)
-                    Provider.find<Record<string, any>>(ctx.el!, opts.params, opts.namespace).listen(async p => {
-                        log("Pre onParams", p);
-                        ctx.params = p;
-                        ctx.query = makeQuery(ctx.path as string, ctx.params);
-
-                        if (debounceHandle) clearTimeout(debounceHandle);
-                        debounceHandle = setTimeout(async () => {
+                    await new Promise(res => {
+                        let first = true;
+                        Provider.find<AxiosInstance>(ctx.el!, opts.axios ?? "axios", opts.namespace).listen(async a => {
                             try {
-                                await ctx.fns?.onParams?.(ctx);
+                                ctx.axios = a;
+                                await ctx.fns?.onAxios?.(ctx);
                             } catch(err) {
                                 throwQuantum(ctx.el!, err);
                             }
-                        }, opts.debounce ?? 100);
-                    });
+                            if (first) res();
+                        })
+                    });    
+                    
+                    if (opts.params !== undefined) await new Promise(res => {
+                        let debounceHandle: any;
+                        let first = true;
+                        Provider.find<Record<string, any>>(ctx.el!, opts.params!, opts.namespace).listen(async p => {
+                            log("Pre onParams", p);
+                            ctx.params = p;
+                            ctx.query = makeQuery(ctx.url as string, ctx.params);
+    
+                            if (debounceHandle) clearTimeout(debounceHandle);
+                            debounceHandle = setTimeout(async () => {
+                                try {
+                                    await ctx.fns?.onParams?.(ctx);
+                                } catch(err) {
+                                    throwQuantum(ctx.el!, err);
+                                }
+                                if (first) res();
+                            }, opts.debounce ?? 100);
+                        })
+                    });   
                 } catch(err) {
                     throwQuantum(ctx.el!, err);
                 }
