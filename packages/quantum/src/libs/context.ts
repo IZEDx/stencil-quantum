@@ -170,7 +170,7 @@ export function React(opts: ReactOptions)
 
             const hookProvider = () => 
             {
-                const provider = Provider.find(el, opts.on);
+                const provider = Provider.find(el, opts.on, opts.namespace);
                 unlisten = provider.listen(v => 
                 { 
                     try {
