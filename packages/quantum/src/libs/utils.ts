@@ -1,6 +1,5 @@
 import { HTMLStencilElement } from "@stencil/core/internal";
 import { QuantumError } from "./error";
-import { QuantumConfig, ContextType } from "./key";
 
 //#region Logging
 
@@ -14,12 +13,6 @@ export const nop = () => {};
 //#endregion
 
 //#region Stencil Component Hooking
-
-export type TypedComponentPrototype<T extends QuantumConfig<any>, K extends keyof T["keys"], P extends string> = {
-    el: HTMLStencilElement;
-    componentWillLoad?: (...args: any[]) => Promise<void>|void;
-    componentDidLoad?: (...args: any[]) => Promise<void>|void;
-} & { [L in K]: ContextType<T, K> } & { [L in P]: any };
 
 export interface ComponentPrototype {
     el: HTMLStencilElement;

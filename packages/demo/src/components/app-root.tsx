@@ -1,7 +1,8 @@
 import { Component, h, Element, Listen } from '@stencil/core';
-import { Provide, log, ContextError, QuantumError } from 'stencil-quantum';
+import { log, ContextError, QuantumError } from 'stencil-quantum';
 import axios from "restyped-axios";
 import { APISchema } from '../api.schema';
+import { demo } from '../context/demo';
 
 log.debug = true;
 
@@ -16,11 +17,14 @@ const demoNames = [
 export class AppRoot 
 {
 	@Element() el!: HTMLAppRootElement;
-	@Provide() personToGreet = "Your Name";
+
+	@demo.Provide("personToGreet") personToGreet = "Your Name";
+
+
 	hasCustomName = false;
 	demoNameIndex = -1;
 	wtf = axios.create<APISchema>({baseURL: "/assets/api/"});
-	@Provide() api = axios.create<APISchema>({baseURL: "/assets/api/"});
+	@demo.Provide("api") api = axios.create<APISchema>({baseURL: "/assets/api/"});
 
 	@ContextError() error!: QuantumError;
 

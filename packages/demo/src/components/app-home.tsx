@@ -1,6 +1,12 @@
 import { Component, h, Element } from '@stencil/core';
-import { Context, React, Get } from 'stencil-quantum';
+import { Get, QuantumConfig, qt } from 'stencil-quantum';
 import { APISchema } from '../api.schema';
+import { demo } from '../context/demo';
+
+const q = new QuantumConfig(
+{
+  userParams: qt<{id: string}>()
+})
 
 @Component({
   tag: 'app-home'
@@ -8,15 +14,15 @@ import { APISchema } from '../api.schema';
 export class AppHome {
   @Element() el!: HTMLAppHomeElement;
 
-  @Context() personToGreet = "";
+  @demo.Context("personToGreet") personToGreet = "";
 
-  @React({ on: "personToGreet", provide: "userRequest" })
-  prepareUserRequest()
+  @demo.React("personToGreet", q, "userParams")
+  prepareUserParams(name: string)
   {
-    return { id: this.personToGreet.toLowerCase() + ".json" }
+    return { id: name.toLowerCase() + ".json" }
   }
   
-  @Get<APISchema>({ url: "/user/:id",  axios: "api",  params: "userRequest" }) user = { name: "Guest" };
+  @Get<APISchema>({ url: "/user/:id",  axios: "api",  params: "userParams" }) user = { name: "Guest" };
 
   render() {
     return (

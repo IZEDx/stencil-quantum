@@ -1,5 +1,10 @@
-import { QuantumConfig, qt } from "stencil-quantum/dist/types/libs/key";
+import { QuantumConfig, qt } from "stencil-quantum";
+import { TypedAxiosInstance } from "restyped-axios";
+import { APISchema } from "../api.schema";
 
-export const test = new QuantumConfig({
-    personToGreet: qt<string>()
+export const demo = new QuantumConfig({
+    personToGreet: qt<string>({ mutable: true }),
+    api: qt<TypedAxiosInstance<APISchema>>()
 });
+
+

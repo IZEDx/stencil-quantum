@@ -1,6 +1,6 @@
-import { Context } from "./context";
-import { TypedComponentPrototype } from "./utils";
+import { Context, ContextDecorator, Provide, Observe, ObserveDecorator, React, ReactDecorator, ProvideDecorator } from "./context";
 
+// TODO: Check what actually needs to be exported
 
 export function qt<T>(opts: QuantumType<T> = {}): QuantumType<T>
 {
@@ -20,6 +20,7 @@ export interface ConfigOptions
     namespace?: string;
 }
 
+// TODO: factory function that adds all keys to the config;
 export class QuantumConfig<T extends QuantumSchema>
 {
     public keys: QuantumKeys<T>;
@@ -40,6 +41,26 @@ export class QuantumConfig<T extends QuantumSchema>
     get<K extends keyof QuantumKeys<T>>(key: K): QuantumKeys<T>[K]
     {
         return this.keys[key];
+    }
+
+    Provide<K extends keyof QuantumKeys<T>>(key: K): ProvideDecorator<QuantumConfig<T>, K>
+    {
+        return Provide(this, key);
+    }
+
+    Context<K extends keyof QuantumKeys<T>>(key: K): ContextDecorator<QuantumConfig<T>, K>
+    {
+        return Context(this, key);
+    }
+
+    Observe<K extends keyof QuantumKeys<T>>(key: K): ObserveDecorator<QuantumConfig<T>, K>
+    {
+        return Observe(this, key);
+    }
+
+    React<K extends keyof QuantumKeys<T>, Q extends QuantumConfig<any>, QK extends keyof Q["keys"]>(key: K, target: Q, targetKey: QK): ReactDecorator<QuantumConfig<T>, K, Q, QK>
+    {
+        return React(this, key, target, targetKey);
     }
 }
 
