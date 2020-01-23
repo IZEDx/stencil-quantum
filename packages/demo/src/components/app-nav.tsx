@@ -1,5 +1,6 @@
 import { Component, h, State, Listen, Event, EventEmitter, Element } from '@stencil/core';
 import { Context } from 'stencil-quantum';
+import { test } from '../context/demo';
 
 
 @Component({
@@ -9,7 +10,7 @@ export class AppNav
 {
     @Element() el!: HTMLAppNavElement;    
     @Event() changeName!: EventEmitter<string>;
-    @Context() personToGreet!: string;
+    @Context(test, "personToGreet") personToGreet: string;
 
     @State() expandNav = false;
     @State() theme = "";

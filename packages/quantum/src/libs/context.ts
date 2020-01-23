@@ -1,6 +1,7 @@
 import { Provider } from "./provider";
-import { getEl, hookComponent, ComponentPrototype } from "./utils";
+import { getEl, hookComponent, ComponentPrototype, TypedComponentPrototype } from "./utils";
 import { throwQuantum } from "./error";
+import { QuantumConfig } from "./key";
 
 export interface BaseOptions
 {
@@ -53,19 +54,19 @@ export function Provide(opts?: ContextOptions)
     } 
 }
 
-export function Context(opts?: ContextOptions) 
+export function Context<T extends QuantumConfig<any>, K extends keyof T["keys"]>(config: T, key: K) 
 { 
-    return function (prototype: ComponentPrototype, propertyName: string)
+    return function <P extends string>(prototype: TypedComponentPrototype<T, K, P>, propertyName: P)
     {
-        const key = opts?.on ?? propertyName;
+        const opts = config?.get(key);
         let provider: Provider<any>|undefined;
-        let defaultValue: any;
+        let defaultValue = opts?.default;
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getEl(obj);
 
             try {
-                provider = Provider.find(el, key, opts?.namespace);
+                provider = Provider.find(el, key as any, opts?.namespace);
                 provider.hook(el);
             } catch(err) {
             }
@@ -73,7 +74,7 @@ export function Context(opts?: ContextOptions)
             return () => {
                 try {
                     if (!provider) {
-                        provider = Provider.find(el, key, opts?.namespace);
+                        provider = Provider.find(el, key as any, opts?.namespace);
                         provider.hook(el);
                     }
                 } catch(err) {
