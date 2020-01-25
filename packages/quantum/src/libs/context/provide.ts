@@ -14,7 +14,7 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
     {
         const opts = config?.get(key);
         let provider: Provider<any>|undefined;
-        let defaultValue: any;
+        let defaultValue = opts?.default;
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getElement(obj);
