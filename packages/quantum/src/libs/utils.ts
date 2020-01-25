@@ -15,7 +15,6 @@ export const nop = () => {};
 //#region Stencil Component Hooking
 
 export interface ComponentPrototype {
-    el: HTMLStencilElement;
     componentWillLoad?: (...args: any[]) => Promise<void>|void;
     componentDidLoad?: (...args: any[]) => Promise<void>|void;
     [key: string]: any;
