@@ -1,13 +1,13 @@
-import { QuantumConfig, ContextType } from "../key";
+import { Entanglement, ContextType } from "../quantum";
 
-export type TypedContextPrototype<T extends QuantumConfig<any>, K extends keyof T["keys"], P extends string> = {
+export type TypedContextPrototype<T extends Entanglement<any>, K extends keyof T["keys"], P extends string> = {
     componentWillLoad?: (...args: any[]) => Promise<void>|void;
     componentDidLoad?: (...args: any[]) => Promise<void>|void;
 } & { [L in P]: ContextType<T, K> };
 
 
 export type TypedObservePrototype<
-    T extends QuantumConfig<any>, 
+    T extends Entanglement<any>, 
     K extends keyof T["keys"], 
     P extends string
 > = {
@@ -17,8 +17,8 @@ export type TypedObservePrototype<
 
 
 export type TypedReactPrototype<
-    T1 extends QuantumConfig<any>, K1 extends keyof T1["keys"], 
-    T2 extends QuantumConfig<any>, K2 extends keyof T2["keys"], 
+    T1 extends Entanglement<any>, K1 extends keyof T1["keys"], 
+    T2 extends Entanglement<any>, K2 extends keyof T2["keys"], 
     P extends string
 > = {
     componentWillLoad?: (...args: any[]) => Promise<void>|void;

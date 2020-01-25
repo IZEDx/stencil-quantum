@@ -1,14 +1,14 @@
-import { QuantumConfig } from "../key";
 import { TypedContextPrototype } from "./prototypes";
 import { Provider } from "../provider";
 import { getElement } from "@stencil/core";
 import { hookComponent } from "../utils";
 import { throwQuantum } from "../error";
+import { Entanglement } from "../quantum";
 
-export type ProvideDecorator<T extends QuantumConfig<any>, K extends keyof T["keys"]> 
+export type ProvideDecorator<T extends Entanglement<any>, K extends keyof T["keys"]> 
     = <P extends string>(prototype: TypedContextPrototype<T, K, P>, propertyName: P) => void;
 
-export function Provide<T extends QuantumConfig<any>, K extends keyof T["keys"]>(config: T, key: K): ProvideDecorator<T, K>
+export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(config: T, key: K): ProvideDecorator<T, K>
 { 
     return function <P extends string>(prototype: TypedContextPrototype<T, K, P>, propertyName: P)
     {

@@ -2,13 +2,13 @@ import { throwQuantum } from "../error";
 import { Provider } from "../provider";
 import { hookComponent } from "../utils";
 import { TypedObservePrototype } from "./prototypes";
-import { QuantumConfig } from "../key";
 import { getElement } from "@stencil/core";
+import { Entanglement } from "../quantum";
 
-export type ObserveDecorator<T extends QuantumConfig<any>, K extends keyof T["keys"]> 
+export type ObserveDecorator<T extends Entanglement<any>, K extends keyof T["keys"]> 
     = <P extends string>(prototype: TypedObservePrototype<T, K, P>, propertyName: P, desc: PropertyDescriptor) => PropertyDescriptor;
 
-export function Observe<T extends QuantumConfig<any>, K extends keyof T["keys"]>(config: T, key: K): ObserveDecorator<T, K>
+export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(config: T, key: K): ObserveDecorator<T, K>
 { 
     return function <P extends string>(
         prototype: TypedObservePrototype<T, K, P>, 

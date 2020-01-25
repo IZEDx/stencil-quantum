@@ -15,9 +15,5 @@ export interface QuantumKey<T, C extends Entanglement<any>> extends EntangleOpti
 
 type ResolveQuantumType<T extends Record<string, QuantumType<any>>, K extends keyof T> = T[K] extends QuantumType<infer R> ? R : never;
 
-
-// Unused?
-/*
 export type ContextType<T extends Entanglement<any>, K extends keyof T["keys"]> = ResolveQuantumKey<T["keys"][K], T>;
 type ResolveQuantumKey<K, C extends Entanglement<any>> = K extends QuantumKey<infer T, C> ? T : never;
-*/

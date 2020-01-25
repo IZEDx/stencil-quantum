@@ -1,19 +1,19 @@
-import { QuantumConfig } from "../key";
 import { TypedReactPrototype } from "./prototypes";
 import { Provider } from "../provider";
 import { getElement } from "@stencil/core";
 import { hookComponent } from "../utils";
 import { throwQuantum } from "../error";
+import { Entanglement } from "../quantum";
 
 export type ReactDecorator<
-    T1 extends QuantumConfig<any>, K1 extends keyof T1["keys"],
-    T2 extends QuantumConfig<any>, K2 extends keyof T2["keys"]
+    T1 extends Entanglement<any>, K1 extends keyof T1["keys"],
+    T2 extends Entanglement<any>, K2 extends keyof T2["keys"]
 > 
 = <P extends string>(prototype: TypedReactPrototype<T1, K1, T2, K2, P>, propertyName: P, desc: PropertyDescriptor) => PropertyDescriptor;
 
 export function React<
-    T1 extends QuantumConfig<any>, K1 extends keyof T1["keys"],
-    T2 extends QuantumConfig<any>, K2 extends keyof T2["keys"]
+    T1 extends Entanglement<any>, K1 extends keyof T1["keys"],
+    T2 extends Entanglement<any>, K2 extends keyof T2["keys"]
 >(from: T1, fromKey: K1, to: T2, toKey: K2): ReactDecorator<T1, K1, T2, K2>
 { 
     return function <P extends string>(

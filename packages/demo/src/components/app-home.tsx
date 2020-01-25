@@ -1,9 +1,9 @@
 import { Component, h, Element } from '@stencil/core';
-import { Get, QuantumConfig, qt } from 'stencil-quantum';
+import { Get, Entanglement, qt } from 'stencil-quantum';
 import { APISchema } from '../api.schema';
 import { demo } from '../context/demo';
 
-const q = new QuantumConfig(
+const q = new Entanglement(
 {
   userParams: qt<{id: string}>()
 })
@@ -19,6 +19,7 @@ export class AppHome {
   @demo.React("personToGreet", q, "userParams")
   prepareUserParams(name: string)
   {
+    console.log("preparing", name);
     return { id: name.toLowerCase() + ".json" }
   }
   

@@ -1,4 +1,4 @@
-import { Component, h, Element, Listen, getElement } from '@stencil/core';
+import { Component, h, Element, Listen } from '@stencil/core';
 import { log, ContextError, QuantumError } from 'stencil-quantum';
 import axios from "restyped-axios";
 import { APISchema } from '../api.schema';
