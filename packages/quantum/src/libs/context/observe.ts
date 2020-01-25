@@ -1,5 +1,5 @@
 import { throwQuantum } from "../error";
-import { Provider } from "../provider";
+import { Provider, Listener } from "../provider";
 import { hookComponent } from "../utils";
 import { TypedObservePrototype } from "./prototypes";
 import { getElement } from "@stencil/core";
@@ -18,16 +18,17 @@ export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(
     {
         const opts = config?.get(key);
         const method = propertyDesciptor.value;
+        let provider: Provider<any>|undefined;
+        let listener: Listener<any>|undefined;
 
         hookComponent(prototype, "componentWillLoad", obj => 
         {
             const el = getElement(obj);
-            let unlisten = () => {};
 
             const hookProvider = () => 
             {
-                const provider = Provider.find(el, key as any, opts?.namespace);
-                unlisten = provider.listen(v => 
+                provider = Provider.find(el, key as any, opts?.namespace);
+                listener = provider.listen(v => 
                 { 
                     try {
                         method.apply(obj, [v]);
@@ -43,13 +44,28 @@ export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(
 
             return () => 
             {
-                unlisten();
+                listener?.unlisten();
                 try {
                     hookProvider();
                 } catch(err) {
                     throwQuantum(el, err);
                 }
             }
+        });
+
+
+        hookComponent(prototype, "disconnectedCallback", obj => {
+            if (listener) listener!.paused = true;
+        });
+
+        hookComponent(prototype, "connectedCallback", obj => {
+            if (listener) listener!.paused = false;
+        });
+
+        hookComponent(prototype, "componentWillUnload", obj => {
+            listener?.unlisten();
+            provider = undefined;
+            listener = undefined;
         });
 
         return propertyDesciptor;

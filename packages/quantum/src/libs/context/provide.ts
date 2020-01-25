@@ -45,5 +45,19 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
                 configurable: true
             });
         }
+
+
+        hookComponent(prototype, "disconnectedCallback", obj => {
+            provider?.pause();
+        });
+
+        hookComponent(prototype, "connectedCallback", obj => {
+            provider?.pause(false);
+        });
+
+        hookComponent(prototype, "componentWillUnload", obj => {
+            provider?.destroy();
+            provider = undefined;
+        });
     } 
 }

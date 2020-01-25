@@ -1,5 +1,5 @@
 import { TypedReactPrototype } from "./prototypes";
-import { Provider } from "../provider";
+import { Provider, Listener } from "../provider";
 import { getElement } from "@stencil/core";
 import { hookComponent } from "../utils";
 import { throwQuantum } from "../error";
@@ -25,18 +25,18 @@ export function React<
         const fromOpts = from.get(fromKey);
         const toOpts = to.get(toKey);
         const method = propertyDesciptor.value;
+        let listener: Listener<any>|undefined;
 
         hookComponent(prototype, "componentWillLoad", obj => 
         {
             const el = getElement(obj);
-            let unlisten = () => {};
             const resultProvider = Provider.create(el, toOpts.name, undefined, toOpts.namespace);
             resultProvider.mutable = !!toOpts.mutable;
 
             const hookProvider = () => 
             {
                 const provider = Provider.find(el, fromOpts.name, fromOpts.namespace);
-                unlisten = provider.listen(async v => 
+                listener = provider.listen(async v => 
                 { 
                     try {
                         const result = await method.apply(obj, [v]);
@@ -58,7 +58,7 @@ export function React<
             {
                 if (retry)
                 {
-                    unlisten();
+                    listener?.unlisten();
                     try {
                         hookProvider();
                     } catch(err) {
@@ -66,6 +66,21 @@ export function React<
                     }
                 }
             }
+        });
+
+
+
+        hookComponent(prototype, "disconnectedCallback", obj => {
+            if (listener) listener!.paused = true;
+        });
+
+        hookComponent(prototype, "connectedCallback", obj => {
+            if (listener) listener!.paused = false;
+        });
+
+        hookComponent(prototype, "componentWillUnload", obj => {
+            listener?.unlisten();
+            listener = undefined;
         });
 
         return propertyDesciptor;

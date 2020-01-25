@@ -5,16 +5,27 @@ import { QuantumError } from "./error";
 const $providers = Symbol.for("stencil-quantum-providers");
 export type ProvideCallback<T> = (newvalue: T, oldvalue?: T) => void;
 
-
+export interface Listener<T>
+{
+    action: ProvideCallback<T>;
+    unlisten: Function;
+    paused: boolean;
+}
 
 export class Provider<T>
 {
-    listeners = [] as ProvideCallback<T>[];
-    hooks = new Map<HTMLStencilElement, Function>();
+    listeners = [] as Listener<T>[];
+    hooks = new Map<HTMLStencilElement, Listener<T>>();
     mutable = false;
+    paused = false;
 
     constructor(public readonly key: string|symbol, private value: T)
     {
+    }
+
+    pause(paused = true)
+    {
+        this.paused = paused;
     }
 
     retrieve = (): T =>
@@ -27,7 +38,12 @@ export class Provider<T>
         log("PROVIDING", value, "to", this.listeners);
         let oldvalue = this.value;
         this.value = value;
-        this.listeners.forEach(cb => cb(value, oldvalue));
+        if (!this.paused)
+        {
+            this.listeners
+                .filter(listener => !listener.paused)
+                .forEach(listener => listener.action(value, oldvalue));
+        }
         return this;
     }
 
@@ -36,14 +52,24 @@ export class Provider<T>
         return this.provide(fn(this.retrieve()));
     }
 
-    listen = (cb: ProvideCallback<T>, updateImmediately = true) =>
+    listen = (cb: ProvideCallback<T>, updateImmediately = true, el?: HTMLStencilElement) =>
     {
         log("LISTEN", updateImmediately, this, cb);
-        this.listeners = [...this.listeners, cb];
-        if (updateImmediately) cb(this.value);
-        return () => {
-            this.listeners = this.listeners.filter(_cb => _cb !== cb);
+        const listener: Listener<T> = {
+            action: cb,
+            unlisten: () => this.unlisten(cb),
+            paused: false
         }
+
+        this.listeners = [...this.listeners, listener];
+        if (updateImmediately) cb(this.value);
+
+        return listener;
+    }
+
+    unlisten = (cb: ProvideCallback<T>) =>
+    {
+        this.listeners = this.listeners.filter(listener => listener.action !== cb);
     }
 
     attach = <H extends boolean|undefined>(el: H extends true ? HTMLElement : HTMLStencilElement, noHook?: H) =>
@@ -63,6 +89,8 @@ export class Provider<T>
         return this.hooks.has(el);
     }
 
+    getHook = (el: HTMLStencilElement) => this.hooks.get(el);
+
     hook = (el: HTMLStencilElement) =>
     {
         log("Hook Provider", el, this);
@@ -70,15 +98,29 @@ export class Provider<T>
         return this;
     }
 
+    pauseHook = (el: HTMLStencilElement, paused = true) =>
+    {
+        log("Pausing Hook", paused);
+        if (this.isHooked(el)) this.getHook(el)!.paused = paused;
+    }
+
+
     unhook = (el: HTMLStencilElement) =>
     {
         log("Unhook Provider", el, this);
         if (this.isHooked(el)) {
-            this.hooks.get(el)!();
+            this.hooks.get(el)?.unlisten();
             this.hooks.delete(el);
         }
         return this;
     }
+
+    destroy = () =>
+    {
+        this.listeners = [];
+        this.hooks = new Map();
+    }
+
 
     /**
      * Creates a predicate, that filters providers matching a key and having no namespace or being 
