@@ -1,7 +1,8 @@
 import { Provider } from "./provider";
-import { getEl, hookComponent, ComponentPrototype } from "./utils";
+import { hookComponent, ComponentPrototype } from "./utils";
 import { HTMLStencilElement } from "@stencil/core/internal";
 import { throwQuantum } from "./error";
+import { getElement } from "@stencil/core";
 
 export interface EventEmitter
 {
@@ -32,7 +33,7 @@ export function Emit<
         let value: any = prototype[propertyName as string];
 
         hookComponent(prototype, "componentWillLoad", obj => {
-            const el = getEl(obj);
+            const el = getElement(obj);
             
             try {
                 provider = Provider.find(el, opts.emitter, opts.namespace);
@@ -91,7 +92,7 @@ export function Receive<
         hookComponent(prototype, "componentWillLoad", obj => {
             let provider: Provider<any>;
             let lastEmitter: EventEmitter;
-            el = getEl(obj);
+            el = getElement(obj);
 
             const findAndListen = (onErr = (e: any) => {}) => {
                 try {

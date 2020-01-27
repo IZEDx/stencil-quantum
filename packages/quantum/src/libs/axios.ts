@@ -1,8 +1,9 @@
 import { Provider } from "./provider";
-import { getEl, hookComponent, ComponentPrototype, log } from "./utils";
+import { hookComponent, ComponentPrototype, log } from "./utils";
 import { HTMLStencilElement } from "@stencil/core/internal";
 import { RestypedBase } from "restyped";
 import { throwQuantum } from "./error";
+import { getElement } from "@stencil/core";
 
 export interface AxiosResponse<T>
 {
@@ -239,7 +240,7 @@ function Http<Schema, Method extends Methods = "GET">(opts: HttpOptions<Schema>)
 
         hookComponent(prototype, "componentWillLoad", async obj => {
             ctx.obj = obj;
-            ctx.el = getEl(ctx.obj);          
+            ctx.el = getElement(ctx.obj);          
             try {
                 await ctx.fns?.onComponent?.(ctx);
             } catch(err) {

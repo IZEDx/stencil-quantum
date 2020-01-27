@@ -1,6 +1,3 @@
-import { HTMLStencilElement } from "@stencil/core/internal";
-import { QuantumError } from "./error";
-
 //#region Logging
 
 const _log = (...args: any[]) => (<any>_log).debug && console.log(...args);
@@ -35,15 +32,6 @@ export function hookComponent<K extends keyof ComponentPrototype>(prototype: Com
         if (cb2 instanceof Function) await cb2(this);
         return result;
     }
-}
-
-export function getEl(component: any): HTMLStencilElement
-{
-    const el = component?.["el"];
-    if (el instanceof Object && typeof el.forceUpdate === "function") {
-        return el;
-    }
-    throw new QuantumError(`Property 'el' required on ${component}`);
 }
 
 //#endregion

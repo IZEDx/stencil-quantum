@@ -1,7 +1,8 @@
 
 import { Provider } from "./provider";
 import { HTMLStencilElement } from "@stencil/core/internal";
-import { ComponentPrototype, hookComponent, getEl } from "./utils";
+import { ComponentPrototype, hookComponent } from "./utils";
+import { getElement } from "@stencil/core";
 
 const $error = Symbol.for("stencil-quantum-error");
 
@@ -38,7 +39,7 @@ export function Throw(opts?: ErrorOptions)
         let provider: Provider<any>;
 
         hookComponent(prototype, "componentWillLoad", obj => {
-            const el = getEl(obj);
+            const el = getElement(obj);
             try {
                 provider = Provider.find<QuantumError>(el, $error, opts?.namespace);
                 provider.attach(el);
@@ -68,7 +69,7 @@ export function ContextError(opts?: ErrorOptions)
         let provider: Provider<any>|undefined;
 
         hookComponent(prototype, "componentWillLoad", obj => {
-            const el = getEl(obj);
+            const el = getElement(obj);
             provider = Provider.create(el, $error, prototype[propertyName], opts?.namespace);
 
             try {
@@ -102,7 +103,7 @@ export function Catch(opts?: CatchOptions)
     return function (prototype: ComponentPrototype, propertyName: string, propertyDesciptor: PropertyDescriptor): PropertyDescriptor
     {
         hookComponent(prototype, "componentWillLoad", obj => {
-            const el = getEl(obj);
+            const el = getElement(obj);
             const provider = Provider.create(el, $error, undefined, opts?.namespace)
             const responseProvider = opts?.provide ? Provider.create(el, opts.provide, undefined, opts.namespace) : undefined;
 
