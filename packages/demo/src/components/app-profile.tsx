@@ -30,7 +30,6 @@ export class AppProfile
             </p>
             <p>Code of this page:</p>
             <img src="/assets/profile-code.png"></img>
-            <quantum-consumer name="this throws an error"></quantum-consumer>
           </div>
         </section>
       );

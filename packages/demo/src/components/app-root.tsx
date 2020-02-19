@@ -1,5 +1,5 @@
-import { Component, h, Element, Listen } from '@stencil/core';
-import { log, ContextError, QuantumError } from 'stencil-quantum';
+import { Component, h, Element } from '@stencil/core';
+import { log } from 'stencil-quantum';
 import axios from "restyped-axios";
 import { APISchema } from '../api.schema';
 import { demo } from '../context/demo';
@@ -26,21 +26,11 @@ export class AppRoot
 	wtf = axios.create<APISchema>({baseURL: "/assets/api/"});
 	@demo.Provide("api") api = axios.create<APISchema>({baseURL: "/assets/api/"});
 
-	@ContextError() error!: QuantumError;
-
-	@Listen("changeName") 
-	onChangeName({detail}: {detail: string})
-	{
-		console.log("Changing name to: ", detail);
-		this.personToGreet = detail;
-		this.hasCustomName = true;
-	}
-
 	componentDidLoad() 
 	{
 		console.log("XXXXX MY FUCKING API", this.wtf);
 		console.log("XXXXX MY BROKEN MESS", this.api);
-		this.demoNameChanger();
+		//this.demoNameChanger();
 	}
 
 	demoNameChanger()
@@ -56,16 +46,6 @@ export class AppRoot
 		return (
 			<div>
 				<app-nav></app-nav>
-				{ !this.error ? "" :
-					<section class="section">
-						<div class="container">
-							<div class="notification is-danger">
-								<button class="delete" onClick={() => this.error = undefined}></button>
-								{this.error?.message}
-							</div>
-						</div>
-					</section>
-				}
 				<main>
 					<stencil-router>
 						<stencil-route-switch scrollTopOffset={0}>
