@@ -20,6 +20,7 @@ export class Entanglement<T extends QuantumSchema>
                 name: key,
                 namespace: opts?.namespace,
                 default: value.default,
+                mutable: value.mutable,
                 config: this
             }))
             .reduce((a, b) => ({
