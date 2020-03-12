@@ -1,4 +1,5 @@
 import { HTMLStencilElement } from "@stencil/core/internal";
+import { forceUpdate } from "@stencil/core";
 import { log } from "./utils";
 import { QuantumError } from "./error";
 
@@ -94,7 +95,7 @@ export class Provider<T>
     hook = (el: HTMLStencilElement) =>
     {
         log("Hook Provider", el, this);
-        this.hooks.set(el, this.listen(() => el.forceUpdate()));
+        this.hooks.set(el, this.listen(() => forceUpdate(el)));
         return this;
     }
 

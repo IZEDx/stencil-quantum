@@ -1,5 +1,6 @@
 import { Provider } from "./provider";
 import { hookComponent, ComponentPrototype } from "./utils";
+import { forceUpdate } from "@stencil/core";
 import { HTMLStencilElement } from "@stencil/core/internal";
 import { throwQuantum } from "./error";
 import { getElement } from "@stencil/core";
@@ -86,7 +87,7 @@ export function Receive<
 
         const onValue = (v: any) => {
             value = v;
-            el?.forceUpdate();
+            forceUpdate(el);
         };
 
         hookComponent(prototype, "componentWillLoad", obj => {

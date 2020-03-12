@@ -3,7 +3,7 @@ import { hookComponent, ComponentPrototype, log } from "./utils";
 import { HTMLStencilElement } from "@stencil/core/internal";
 import { RestypedBase } from "restyped";
 import { throwQuantum } from "./error";
-import { getElement } from "@stencil/core";
+import { getElement, forceUpdate } from "@stencil/core";
 
 export interface AxiosResponse<T>
 {
@@ -76,7 +76,7 @@ export function Rest<Schema>(opts: AxiosOptions<Schema>)
             log("Sending Rest GET", ctx);
             const response = await ctx.axios.get(ctx.query.path, {params: ctx.query.params});
             ctx.value = response.data;
-            if (opts.lazy || !ctx.first) ctx.el.forceUpdate();
+            if (opts.lazy || !ctx.first) forceUpdate(ctx.el);
             if (!ctx.first) ctx.first = true;
         },
     
@@ -88,7 +88,7 @@ export function Rest<Schema>(opts: AxiosOptions<Schema>)
                 ctx.fns!.send!(ctx as any);
             }
 
-            if (ctx.el) ctx.el.forceUpdate();
+            if (ctx.el) forceUpdate(ctx.el);
         },
 
         getValue(ctx) {
@@ -129,14 +129,14 @@ export function Get<Schema>(opts: AxiosOptions<Schema>)
             const response = await ctx.axios?.get(ctx.query.path, {params: ctx.query.params});
             ctx.value = response?.data;
             if (ctx.provider) ctx.provider.provide(response.data);
-            else if(opts.lazy || !ctx.first) ctx.el?.forceUpdate();
+            else if(opts.lazy || !ctx.first) forceUpdate(ctx.el);
             if (!ctx.first) ctx.first = true;
         },
     
         setValue(value, ctx) {
             ctx.value = value;
             if (ctx.provider) ctx.provider.provide(value);
-            else if (ctx.el) ctx.el.forceUpdate();
+            else if (ctx.el) forceUpdate(ctx.el);
         },
 
         getValue(ctx) {
@@ -189,7 +189,7 @@ export function Put<Schema>(opts: AxiosOptions<Schema>)
                 ctx.onReady = () => ctx.fns!.send!(ctx as any);
             }
             
-            ctx.el?.forceUpdate();
+            forceUpdate(ctx.el);
         },
 
         getValue(ctx) {
