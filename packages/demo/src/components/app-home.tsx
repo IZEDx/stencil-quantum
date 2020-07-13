@@ -14,7 +14,7 @@ const q = new Entanglement(
 export class AppHome {
   @Element() el!: HTMLAppHomeElement;
 
-  @demo.Context("personToGreet") personToGreet = "";
+  @demo.Context("personToGreet") personToGreet!: string;
 
   @demo.React("personToGreet", q, "userParams")
   prepareUserParams(name: string)

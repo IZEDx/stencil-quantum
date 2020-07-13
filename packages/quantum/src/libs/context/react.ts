@@ -1,7 +1,7 @@
 import { TypedReactPrototype } from "./prototypes";
 import { Provider, Listener } from "../provider";
 import { getElement } from "@stencil/core";
-import { hookComponent } from "../utils";
+import { hookComponent, nop } from "../utils";
 import { throwQuantum } from "../error";
 import { Entanglement } from "../quantum";
 
@@ -26,17 +26,20 @@ export function React<
         const toOpts = to.get(toKey);
         const method = propertyDesciptor.value;
         let listener: Listener<any>|undefined;
+        let resultProvider: Provider<any>|undefined;
+        let inputProvider: Provider<any>|undefined;
 
         hookComponent(prototype, "componentWillLoad", obj => 
         {
             const el = getElement(obj);
-            const resultProvider = Provider.create(el, toOpts.name, undefined, toOpts.namespace);
+
+            resultProvider = Provider.create(el, toOpts.name, undefined, toOpts.namespace);
             resultProvider.mutable = !!toOpts.mutable;
 
             const hookProvider = () => 
             {
-                const provider = Provider.find(el, fromOpts.name, fromOpts.namespace);
-                listener = provider.listen(async v => 
+                inputProvider = Provider.find(el, fromOpts.name, fromOpts.namespace);
+                listener = inputProvider.listen(async v => 
                 { 
                     try {
                         const result = await method.apply(obj, [v]);
@@ -47,16 +50,11 @@ export function React<
                 });
             }
 
-            let retry = false;
             try {
                 hookProvider();
+                return nop;
             } catch(err) {
-                retry = true;
-            }
-
-            return () => 
-            {
-                if (retry)
+                return () => 
                 {
                     listener?.unlisten();
                     try {
@@ -80,7 +78,10 @@ export function React<
 
         hookComponent(prototype, "componentWillUnload", obj => {
             listener?.unlisten();
+            resultProvider?.destroy();
             listener = undefined;
+            resultProvider = undefined;
+            inputProvider = undefined;
         });
 
         return propertyDesciptor;

@@ -57,7 +57,10 @@ export class AppNav
                         </div>
                         <div class="navbar-end">
                             <div class="navbar-item">
-                                <input class="input" type="text" placeholder="Your Name" value={this.personToGreet} onChange={e => this.personToGreet = e.target["value"]} />
+                                <input class="input" type="text" placeholder="Your Name" value={this.personToGreet} onChange={e => {
+                                    console.log("changing personToGreet: ", e.target["value"]);
+                                    this.personToGreet = e.target["value"]
+                                }} />
                             </div>
                             <div class={{"navbar-item": true, "has-dropdown": true, "is-active": this.showThemer}}>
                                 <a class="navbar-link" onClick={() => this.showThemer = true}>

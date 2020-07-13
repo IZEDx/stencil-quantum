@@ -23,13 +23,11 @@ export class AppRoot
 
 	hasCustomName = false;
 	demoNameIndex = -1;
-	wtf = axios.create<APISchema>({baseURL: "/assets/api/"});
 	@demo.Provide("api") api = axios.create<APISchema>({baseURL: "/assets/api/"});
 
 	componentDidLoad() 
 	{
-		console.log("XXXXX MY FUCKING API", this.wtf);
-		console.log("XXXXX MY BROKEN MESS", this.api);
+		console.log(this.api);
 		//this.demoNameChanger();
 	}
 
@@ -41,7 +39,7 @@ export class AppRoot
 		setTimeout(() => this.demoNameChanger(), 2000);
 	}
 
-	render() 
+	render()  
 	{
 		return (
 			<div>

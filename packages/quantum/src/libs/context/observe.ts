@@ -23,6 +23,8 @@ export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(
 
         hookComponent(prototype, "componentWillLoad", obj => 
         {
+            if (provider) return;
+
             const el = getElement(obj);
 
             const hookProvider = () => 
@@ -44,6 +46,8 @@ export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(
 
             return () => 
             {
+                if (provider) return;
+                
                 listener?.unlisten();
                 try {
                     hookProvider();

@@ -22,6 +22,7 @@ export function Context<T extends Entanglement<any>, K extends keyof T["keys"]>(
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getElement(obj);
 
+            if (provider) return;
             try {
                 provider = Provider.find(el, key as any, opts?.namespace);
                 provider.hook(el);
@@ -29,11 +30,11 @@ export function Context<T extends Entanglement<any>, K extends keyof T["keys"]>(
             }
 
             return () => {
+                if (provider) return;
+
                 try {
-                    if (!provider) {
-                        provider = Provider.find(el, key as any, opts?.namespace);
-                        provider.hook(el);
-                    }
+                    provider = Provider.find(el, key as any, opts?.namespace);
+                    provider.hook(el);
                 } catch(err) {
                     throwQuantum(el, err);
                 }
@@ -62,6 +63,7 @@ export function Context<T extends Entanglement<any>, K extends keyof T["keys"]>(
             {
                 get: () => provider?.retrieve() ?? defaultValue,
                 set: v => {
+
                     if (opts?.mutable && provider?.mutable) {
                         provider.provide(v);
                     } else {
