@@ -25,15 +25,14 @@ export function React<
         const fromOpts = from.get(fromKey);
         const toOpts = to.get(toKey);
         const method = propertyDesciptor.value;
-        let listener: Listener<any>|undefined;
-        let resultProvider: Provider<any>|undefined;
-        let inputProvider: Provider<any>|undefined;
 
         hookComponent(prototype, "componentWillLoad", obj => 
         {
             const el = getElement(obj);
+            let listener: Listener<any>|undefined;
+            let inputProvider: Provider<any>|undefined;
 
-            resultProvider = Provider.create(el, toOpts.name, undefined, toOpts.namespace);
+            const resultProvider = Provider.create(el, toOpts.name, undefined, toOpts.namespace);
             resultProvider.mutable = !!toOpts.mutable;
 
             const hookProvider = () => 
@@ -49,6 +48,24 @@ export function React<
                     }
                 });
             }
+
+            const unhookDisconnected = hookComponent(prototype, "disconnectedCallback", obj => {
+                if (listener) listener!.paused = true;
+            });
+    
+            const unhookConnected = hookComponent(prototype, "connectedCallback", obj => {
+                if (listener) listener!.paused = false;
+            });
+    
+            const unhookComponentWillLoad = hookComponent(prototype, "componentWillUnload", obj => {
+                listener?.unlisten();
+                resultProvider?.destroy();
+                listener = undefined;
+                inputProvider = undefined;
+                unhookDisconnected();
+                unhookConnected();
+                unhookComponentWillLoad();
+            });
 
             try {
                 hookProvider();
@@ -68,21 +85,6 @@ export function React<
 
 
 
-        hookComponent(prototype, "disconnectedCallback", obj => {
-            if (listener) listener!.paused = true;
-        });
-
-        hookComponent(prototype, "connectedCallback", obj => {
-            if (listener) listener!.paused = false;
-        });
-
-        hookComponent(prototype, "componentWillUnload", obj => {
-            listener?.unlisten();
-            resultProvider?.destroy();
-            listener = undefined;
-            resultProvider = undefined;
-            inputProvider = undefined;
-        });
 
         return propertyDesciptor;
     } 

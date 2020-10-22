@@ -18,12 +18,11 @@ export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(
     {
         const opts = config?.get(key);
         const method = propertyDesciptor.value;
-        let provider: Provider<any>|undefined;
-        let listener: Listener<any>|undefined;
 
         hookComponent(prototype, "componentWillLoad", obj => 
         {
-            if (provider) return;
+            let provider: Provider<any>|undefined;
+            let listener: Listener<any>|undefined;
 
             const el = getElement(obj);
 
@@ -39,6 +38,23 @@ export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(
                     }
                 });
             }
+
+            const unhookDisconnected = hookComponent(prototype, "disconnectedCallback", obj => {
+                if (listener) listener!.paused = true;
+            });
+    
+            const unhookConnected = hookComponent(prototype, "connectedCallback", obj => {
+                if (listener) listener!.paused = false;
+            });
+    
+            const unhookUnload = hookComponent(prototype, "componentWillUnload", obj => {
+                listener?.unlisten();
+                provider = undefined;
+                listener = undefined;
+                unhookDisconnected();
+                unhookConnected();
+                unhookUnload();
+            });
 
             try {
                 hookProvider();
@@ -57,20 +73,6 @@ export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(
             }
         });
 
-
-        hookComponent(prototype, "disconnectedCallback", obj => {
-            if (listener) listener!.paused = true;
-        });
-
-        hookComponent(prototype, "connectedCallback", obj => {
-            if (listener) listener!.paused = false;
-        });
-
-        hookComponent(prototype, "componentWillUnload", obj => {
-            listener?.unlisten();
-            provider = undefined;
-            listener = undefined;
-        });
 
         return propertyDesciptor;
     } 

@@ -32,6 +32,10 @@ export function hookComponent<K extends keyof ComponentPrototype>(prototype: Com
         if (cb2 instanceof Function) await cb2(this);
         return result;
     }
+
+    return () => {
+        prototype[key] = _original;
+    }
 }
 
 //#endregion

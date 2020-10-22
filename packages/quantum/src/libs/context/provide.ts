@@ -13,14 +13,11 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
     return function <P extends string>(prototype: TypedContextPrototype<T, K, P>, propertyName: P)
     {
         const opts = config?.get(key);
-        let provider: Provider<any>|undefined;
         let defaultValue = opts?.default;
 
         hookComponent(prototype, "componentWillLoad", obj => {
-            if (provider) return;
-            
             const el = getElement(obj);
-            provider = Provider.create(el, key as any, defaultValue, opts?.namespace);
+            const provider = Provider.create(el, key as any, defaultValue, opts?.namespace);
             provider.mutable = !!opts?.mutable;
 
             try {
@@ -29,37 +26,32 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
             } catch(err) {
                 throwQuantum(el, err);
             }
-        });
 
-        if (delete prototype[propertyName]) 
-        {
-            Object.defineProperty(prototype, propertyName, 
+            if (delete prototype[propertyName]) 
             {
-                get: () => provider?.retrieve(),
-                set: (v: any) => { 
-                    if (provider) {
-                        provider.provide(v);
-                    } else {
-                        defaultValue = v;
-                    }
-                },
-                enumerable: true,
-                configurable: true
+                Object.defineProperty(prototype, propertyName, 
+                {
+                    get: () => provider.retrieve(),
+                    set: (v: any) => provider.provide(v),
+                    enumerable: true,
+                    configurable: true
+                });
+            }
+    
+            const unhookDisconnected = hookComponent(prototype, "disconnectedCallback", obj => {
+                provider.pause();
             });
-        }
-
-
-        hookComponent(prototype, "disconnectedCallback", obj => {
-            provider?.pause();
-        });
-
-        hookComponent(prototype, "connectedCallback", obj => {
-            provider?.pause(false);
-        });
-
-        hookComponent(prototype, "componentWillUnload", obj => {
-            provider?.destroy();
-            provider = undefined;
+    
+            const unhookConnected = hookComponent(prototype, "connectedCallback", obj => {
+                provider.pause(false);
+            });
+    
+            const unhookUnload = hookComponent(prototype, "componentWillUnload", obj => {
+                provider.destroy();
+                unhookDisconnected();
+                unhookConnected();
+                unhookUnload();
+            });
         });
     } 
 }
