@@ -9,7 +9,7 @@ export class QuantumProvider
 {
     @Element() el!: HTMLQuantumProviderElement;
 
-    @Prop({reflectToAttr: true}) name!: string;
+    @Prop({reflect: true}) name!: string;
     @Prop() value: any;
 
     provider!: Provider<any>;

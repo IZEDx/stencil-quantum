@@ -1,2 +1,2 @@
-export * from "./components";
+export { Components, JSX } from './components';
 export * from "./libs";

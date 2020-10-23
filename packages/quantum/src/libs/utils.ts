@@ -23,7 +23,7 @@ export type ComponentDecorator<K extends string> = (prototype: ComponentPrototyp
 type Callback = (obj: any) => Promise<void>|void;
 export function hookComponent<K extends keyof ComponentPrototype>(prototype: ComponentPrototype, key: K, cb: (obj: any) => Promise<Callback|void>|Callback|void)
 {
-    const _original = prototype[key] || nop;
+    const _original: any = prototype[key] || nop;
 
     prototype[key] = async function(...args: any[]) {
         log(key, this);

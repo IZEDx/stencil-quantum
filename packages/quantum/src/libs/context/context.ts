@@ -28,23 +28,14 @@ export function Context<T extends Entanglement<any>, K extends keyof T["keys"]>(
             } catch(err) {
             }
 
-            const unhookDisconnected = hookComponent(prototype, "disconnectedCallback", obj => {
+            hookComponent(prototype, "disconnectedCallback", obj => {
                 const el = getElement(obj);
                 provider?.pauseHook(el, true);
             });
     
-            const unhookConnected = hookComponent(prototype, "connectedCallback", obj => {
+            hookComponent(prototype, "connectedCallback", obj => {
                 const el = getElement(obj);
                 provider?.pauseHook(el, false);
-            });
-    
-            const unhookUnload = hookComponent(prototype, "componentWillUnload", obj => {
-                const el = getElement(obj);
-                provider?.unhook(el);
-                provider = undefined;
-                unhookDisconnected();
-                unhookConnected();
-                unhookUnload();
             });
     
             if (delete prototype[propertyName]) 

@@ -49,22 +49,12 @@ export function React<
                 });
             }
 
-            const unhookDisconnected = hookComponent(prototype, "disconnectedCallback", obj => {
+            hookComponent(prototype, "disconnectedCallback", obj => {
                 if (listener) listener!.paused = true;
             });
     
-            const unhookConnected = hookComponent(prototype, "connectedCallback", obj => {
+            hookComponent(prototype, "connectedCallback", obj => {
                 if (listener) listener!.paused = false;
-            });
-    
-            const unhookComponentWillLoad = hookComponent(prototype, "componentWillUnload", obj => {
-                listener?.unlisten();
-                resultProvider?.destroy();
-                listener = undefined;
-                inputProvider = undefined;
-                unhookDisconnected();
-                unhookConnected();
-                unhookComponentWillLoad();
             });
 
             try {

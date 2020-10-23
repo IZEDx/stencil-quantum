@@ -13,8 +13,8 @@
     "build:docs": "npm run build:demo && rm -rf ./docs && cp -r packages/demo/www docs && cp -r packages/demo/copy-docs/* docs/ && cp packages/demo/www/index.html docs/404.html"
   },
   "devDependencies": {
-    "@stencil/core": "^1.17.3",
-    "@stencil/router": "latest",
+    "@stencil/core": "^2.1.0",
+    "@stencil/router": "^1.0.1",
     "@types/dompurify": "^2.0.0",
     "@types/jest": "24.0.24",
     "@types/puppeteer": "2.0.0",
@@ -24,6 +24,6 @@
     "lerna": "latest",
     "puppeteer": "2.0.0",
     "restyped-axios": "^2.0.0",
-    "typescript": "^3.7.3"
+    "typescript": "^4.0.3"
   }
 }

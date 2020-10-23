@@ -17,7 +17,7 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getElement(obj);
-            const provider = Provider.create(el, key as any, defaultValue, opts?.namespace);
+            const provider = Provider.create(el, key as any, defaultValue ?? obj[propertyName], opts?.namespace);
             provider.mutable = !!opts?.mutable;
 
             try {
@@ -26,6 +26,7 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
             } catch(err) {
                 throwQuantum(el, err);
             }
+
 
             if (delete prototype[propertyName]) 
             {
@@ -38,19 +39,12 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
                 });
             }
     
-            const unhookDisconnected = hookComponent(prototype, "disconnectedCallback", obj => {
+            hookComponent(prototype, "disconnectedCallback", obj => {
                 provider.pause();
             });
     
-            const unhookConnected = hookComponent(prototype, "connectedCallback", obj => {
+            hookComponent(prototype, "connectedCallback", obj => {
                 provider.pause(false);
-            });
-    
-            const unhookUnload = hookComponent(prototype, "componentWillUnload", obj => {
-                provider.destroy();
-                unhookDisconnected();
-                unhookConnected();
-                unhookUnload();
             });
         });
     } 

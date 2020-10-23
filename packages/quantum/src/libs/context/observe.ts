@@ -39,21 +39,12 @@ export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(
                 });
             }
 
-            const unhookDisconnected = hookComponent(prototype, "disconnectedCallback", obj => {
+            hookComponent(prototype, "disconnectedCallback", obj => {
                 if (listener) listener!.paused = true;
             });
     
-            const unhookConnected = hookComponent(prototype, "connectedCallback", obj => {
+            hookComponent(prototype, "connectedCallback", obj => {
                 if (listener) listener!.paused = false;
-            });
-    
-            const unhookUnload = hookComponent(prototype, "componentWillUnload", obj => {
-                listener?.unlisten();
-                provider = undefined;
-                listener = undefined;
-                unhookDisconnected();
-                unhookConnected();
-                unhookUnload();
             });
 
             try {

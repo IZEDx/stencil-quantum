@@ -9,7 +9,7 @@ export class QuantumConsumer {
 
     @Element() el!: HTMLQuantumConsumerElement;
     
-    @Prop({reflectToAttr: true}) name!: string;
+    @Prop({reflect: true}) name!: string;
     @Prop() mapper = (val: any) => `${val}`;
     @State() value!: string;
 
