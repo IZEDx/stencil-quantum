@@ -10,4 +10,5 @@ export interface QuantumType<T>
 {
     default?: T;
     mutable?: boolean;
+    debug?: boolean;
 }

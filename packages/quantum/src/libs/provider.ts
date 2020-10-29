@@ -20,7 +20,7 @@ export class Provider<T>
     mutable = false;
     paused = false;
 
-    constructor(public readonly key: string|symbol, private value: T)
+    constructor(public readonly key: string|symbol, private value: T, public debug = false)
     {
     }
 
@@ -36,7 +36,7 @@ export class Provider<T>
 
     provide = (value: T) =>
     {
-        log("PROVIDING", value, "to", this.listeners);
+        if (this.debug) log(`(${String(this.key)}) `, "PROVIDING", value, "to", this.listeners);
         let oldvalue = this.value;
         this.value = value;
         if (!this.paused)
@@ -55,7 +55,7 @@ export class Provider<T>
 
     listen = (cb: ProvideCallback<T>, updateImmediately = true, el?: HTMLStencilElement) =>
     {
-        log("LISTEN", updateImmediately, this, cb);
+        if (this.debug) log(`(${String(this.key)}) `, "LISTEN", updateImmediately, this, cb);
         const listener: Listener<T> = {
             action: cb,
             unlisten: () => this.unlisten(cb),
@@ -75,12 +75,12 @@ export class Provider<T>
 
     attach = <H extends boolean|undefined>(el: H extends true ? HTMLElement : HTMLStencilElement, noHook?: H) =>
     { 
-        log("Add Provider", el, this);
+        if (this.debug) log(`(${String(this.key)}) `, "Add Provider", el, this);
 
         const providers = Provider.getAttached(el);
         if (!providers.includes(this)) providers.push(this);
 
-        log("Total Providers", el, providers);
+        if (this.debug) log(`(${String(this.key)}) `, "Total Providers", el, providers);
         
         return noHook ? this : this.hook(el as any);
     }
@@ -94,21 +94,21 @@ export class Provider<T>
 
     hook = (el: HTMLStencilElement) =>
     {
-        log("Hook Provider", el, this);
+        if (this.debug) log(`(${String(this.key)}) `, "Hook Provider", el, this);
         this.hooks.set(el, this.listen(() => forceUpdate(el)));
         return this;
     }
 
     pauseHook = (el: HTMLStencilElement, paused = true) =>
     {
-        log("Pausing Hook", paused);
+        if (this.debug) log(`(${String(this.key)}) `, "Pausing Hook", paused);
         if (this.isHooked(el)) this.getHook(el)!.paused = paused;
     }
 
 
     unhook = (el: HTMLStencilElement) =>
     {
-        log("Unhook Provider", el, this);
+        if (this.debug) log(`(${String(this.key)}) `, "Unhook Provider", el, this);
         if (this.isHooked(el)) {
             this.hooks.get(el)?.unlisten();
             this.hooks.delete(el);
@@ -133,9 +133,9 @@ export class Provider<T>
         return (p: Provider<any>) => p.key === key || (namespace && typeof key === "string" && p.key === namespace + "__" + key);
     } 
 
-    static find<T>(el: HTMLElement, key: string|symbol, namespace?: string): Provider<T>
+    static find<T>(el: HTMLElement, key: string|symbol, namespace?: string, debug?: boolean): Provider<T>
     {
-        log("Searching Provider", key, namespace,  el);
+        if (debug) log(`(${String(key)}) `, "Searching Provider", key, namespace,  el);
         const providers = Provider.getAttached(el).filter(Provider.makeFilter(key, namespace));
 
         if (providers.length > 1) {
@@ -152,14 +152,14 @@ export class Provider<T>
             throw new QuantumError(`No provider in hierarchy found that matches "${String(key)}"!`);
         }
         
-        return Provider.find<T>(parent, key, namespace).attach(el, true); // Attach reference to this el to make lookup for children shorter
+        return Provider.find<T>(parent, key, namespace, debug).attach(el, true); // Attach reference to this el to make lookup for children shorter
     }
 
-    static create<T>(el: HTMLStencilElement, key: string|symbol, value: T, namespace?: string): Provider<T>
+    static create<T>(el: HTMLStencilElement, key: string|symbol, value: T, namespace?: string, debug?: boolean): Provider<T>
     {
         if (typeof key === "string") key = (namespace ? namespace + "__" : "") + key;
-        log("Create Provider", el, key, value);
-        return new Provider(key, value).attach(el);
+        if (debug) log(`(${String(key)}) `, "Create Provider", el, key, value);
+        return new Provider(key, value, debug).attach(el);
     }
 
     static getAttached(el: HTMLElement): Provider<any>[]
