@@ -13,11 +13,12 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
     return function <P extends string>(prototype: TypedContextPrototype<T, K, P>, propertyName: P)
     {
         const opts = config?.get(key);
-        let defaultValue = opts?.default;
+        let defaultValue = prototype[propertyName] || opts?.default;
+        delete prototype[propertyName];
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getElement(obj);
-            const provider = Provider.create(el, key as any, defaultValue ?? obj[propertyName], opts?.namespace);
+            const provider = Provider.create(el, key as any, defaultValue ?? obj[propertyName], opts?.namespace, opts?.debug);
             provider.mutable = !!opts?.mutable;
 
             try {
@@ -27,17 +28,13 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
                 throwQuantum(el, err);
             }
 
-
-            if (delete prototype[propertyName]) 
+            Object.defineProperty(obj, propertyName, 
             {
-                Object.defineProperty(prototype, propertyName, 
-                {
-                    get: () => provider.retrieve(),
-                    set: (v: any) => provider.provide(v),
-                    enumerable: true,
-                    configurable: true
-                });
-            }
+                get: () => provider.retrieve(),
+                set: (v: any) => provider.provide(v),
+                enumerable: true,
+                configurable: true
+            });
     
             hookComponent(prototype, "disconnectedCallback", obj => {
                 provider.pause();

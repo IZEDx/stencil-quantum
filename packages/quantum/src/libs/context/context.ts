@@ -17,13 +17,14 @@ export function Context<T extends Entanglement<any>, K extends keyof T["keys"]>(
     {
         const opts = config?.get(key);
         let defaultValue = opts?.default;
+        delete prototype[propertyName];
 
         hookComponent(prototype, "componentWillLoad", obj => {
             const el = getElement(obj);
             let provider: Provider<any>|undefined;
 
             try {
-                provider = Provider.find(el, key as any, opts?.namespace);
+                provider = Provider.find(el, key as any, opts?.namespace, opts?.debug);
                 provider.hook(el);
             } catch(err) {
             }
@@ -36,31 +37,28 @@ export function Context<T extends Entanglement<any>, K extends keyof T["keys"]>(
             hookComponent(prototype, "connectedCallback", obj => {
                 const el = getElement(obj);
                 provider?.pauseHook(el, false);
-            });
-    
-            if (delete prototype[propertyName]) 
+            }); 
+
+            Object.defineProperty(obj, propertyName, 
             {
-                Object.defineProperty(prototype, propertyName, 
-                {
-                    get: () => provider?.retrieve() ?? defaultValue,
-                    set: v => {
-    
-                        if (opts?.mutable && provider?.mutable) {
-                            provider.provide(v);
-                        } else {
-                            defaultValue = v;
-                        }
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-            }
+                get: () => provider?.retrieve() ?? defaultValue,
+                set: v => {
+
+                    if (opts?.mutable && provider?.mutable) {
+                        provider.provide(v);
+                    } else {
+                        defaultValue = v;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
 
             return () => {
                 if (provider) return;
 
                 try {
-                    provider = Provider.find(el, key as any, opts?.namespace);
+                    provider = Provider.find(el, key as any, opts?.namespace, opts?.debug);
                     provider.hook(el);
                 } catch(err) {
                     throwQuantum(el, err);
