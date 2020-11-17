@@ -42,10 +42,8 @@
     "stencil": "../../node_modules/.bin/stencil"
   },
   "devDependencies": {
-    "np": "latest"
   },
   "license": "MIT",
   "dependencies": {
-    "restyped": "^1.1.0"
   }
 }

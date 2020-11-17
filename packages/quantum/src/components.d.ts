@@ -5,15 +5,28 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { QuantumKey } from "./libs";
 export namespace Components {
     interface QuantumConsumer {
+        "bind": QuantumKey<any, any>;
+        "debug"?: boolean;
+        "name"?: string;
+        "namespace"?: string;
+    }
+    interface QuantumDisplay {
+        "bind": QuantumKey<any, any>;
+        "debug"?: boolean;
         "mapper": (val: any) => string;
-        "name": string;
+        "name"?: string;
+        "namespace"?: string;
     }
     interface QuantumFetch {
     }
     interface QuantumProvider {
-        "name": string;
+        "bind"?: QuantumKey<any, any>;
+        "debug"?: boolean;
+        "name"?: string;
+        "namespace"?: string;
         "value": any;
     }
 }
@@ -23,6 +36,12 @@ declare global {
     var HTMLQuantumConsumerElement: {
         prototype: HTMLQuantumConsumerElement;
         new (): HTMLQuantumConsumerElement;
+    };
+    interface HTMLQuantumDisplayElement extends Components.QuantumDisplay, HTMLStencilElement {
+    }
+    var HTMLQuantumDisplayElement: {
+        prototype: HTMLQuantumDisplayElement;
+        new (): HTMLQuantumDisplayElement;
     };
     interface HTMLQuantumFetchElement extends Components.QuantumFetch, HTMLStencilElement {
     }
@@ -38,23 +57,38 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "quantum-consumer": HTMLQuantumConsumerElement;
+        "quantum-display": HTMLQuantumDisplayElement;
         "quantum-fetch": HTMLQuantumFetchElement;
         "quantum-provider": HTMLQuantumProviderElement;
     }
 }
 declare namespace LocalJSX {
     interface QuantumConsumer {
+        "bind": QuantumKey<any, any>;
+        "debug"?: boolean;
+        "name"?: string;
+        "namespace"?: string;
+        "onValue"?: (event: CustomEvent<any>) => void;
+    }
+    interface QuantumDisplay {
+        "bind": QuantumKey<any, any>;
+        "debug"?: boolean;
         "mapper"?: (val: any) => string;
-        "name": string;
+        "name"?: string;
+        "namespace"?: string;
     }
     interface QuantumFetch {
     }
     interface QuantumProvider {
-        "name": string;
+        "bind"?: QuantumKey<any, any>;
+        "debug"?: boolean;
+        "name"?: string;
+        "namespace"?: string;
         "value"?: any;
     }
     interface IntrinsicElements {
         "quantum-consumer": QuantumConsumer;
+        "quantum-display": QuantumDisplay;
         "quantum-fetch": QuantumFetch;
         "quantum-provider": QuantumProvider;
     }
@@ -64,6 +98,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "quantum-consumer": LocalJSX.QuantumConsumer & JSXBase.HTMLAttributes<HTMLQuantumConsumerElement>;
+            "quantum-display": LocalJSX.QuantumDisplay & JSXBase.HTMLAttributes<HTMLQuantumDisplayElement>;
             "quantum-fetch": LocalJSX.QuantumFetch & JSXBase.HTMLAttributes<HTMLQuantumFetchElement>;
             "quantum-provider": LocalJSX.QuantumProvider & JSXBase.HTMLAttributes<HTMLQuantumProviderElement>;
         }

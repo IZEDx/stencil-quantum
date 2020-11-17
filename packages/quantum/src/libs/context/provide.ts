@@ -36,12 +36,12 @@ export function Provide<T extends Entanglement<any>, K extends keyof T["keys"]>(
                 configurable: true
             });
     
-            hookComponent(prototype, "disconnectedCallback", obj => {
-                provider.pause();
+            hookComponent(prototype, "disconnectedCallback", o => {
+                if (o === obj) provider.pause();
             });
     
-            hookComponent(prototype, "connectedCallback", obj => {
-                provider.pause(false);
+            hookComponent(prototype, "connectedCallback", o => {
+                if (o === obj) provider.pause(false);
             });
         });
     } 

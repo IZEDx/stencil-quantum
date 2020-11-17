@@ -1,19 +1,20 @@
-import { h, Component, Element, Event, EventEmitter, Prop } from '@stencil/core';
+import { Component, Element, Prop, State } from '@stencil/core';
 import { Provider } from '../../libs/provider';
 import { QuantumKey, throwQuantum } from '../../libs';
 
 @Component({
-    tag: 'quantum-consumer'
+    tag: 'quantum-display'
 })
-export class QuantumConsumer {
+export class QuantumDisplay {
 
-    @Element() el!: HTMLQuantumConsumerElement;
-    @Event() value!: EventEmitter<any>;
+    @Element() el!: HTMLQuantumDisplayElement;
     
     @Prop() bind!: QuantumKey<any, any>;
     @Prop({reflect: true, mutable: true}) name?: string;
     @Prop({reflect: true, mutable: true}) namespace?: string;
     @Prop({reflect: true, mutable: true}) debug?: boolean;
+    @Prop() mapper = (val: any) => `${val}`;
+    @State() value!: string;
 
     async componentWillLoad()
     {
@@ -24,17 +25,18 @@ export class QuantumConsumer {
             const provider = Provider.find(this.el, this.name, this.namespace, this.debug);
             provider.listen(val => {
                 try {
-                    this.value.emit(val);
+                    this.value = this.mapper(val)
                 } catch(err) {
                     throwQuantum(this.el, err);
                 }
             }, true);
+
         } catch(err) {
             throwQuantum(this.el, err);
         }
     }
 
     render() {
-        return <slot />;
+        return this.value;
     }
 }

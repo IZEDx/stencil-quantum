@@ -49,12 +49,12 @@ export function React<
                 });
             }
 
-            hookComponent(prototype, "disconnectedCallback", obj => {
-                if (listener) listener!.paused = true;
+            hookComponent(prototype, "disconnectedCallback", o => {
+                if (o === obj && listener) listener!.paused = true;
             });
     
-            hookComponent(prototype, "connectedCallback", obj => {
-                if (listener) listener!.paused = false;
+            hookComponent(prototype, "connectedCallback", o => {
+                if (o === obj && listener) listener!.paused = false;
             });
 
             try {

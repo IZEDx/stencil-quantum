@@ -39,12 +39,12 @@ export function Observe<T extends Entanglement<any>, K extends keyof T["keys"]>(
                 });
             }
 
-            hookComponent(prototype, "disconnectedCallback", obj => {
-                if (listener) listener!.paused = true;
+            hookComponent(prototype, "disconnectedCallback", o => {
+                if (o === obj && listener) listener!.paused = true;
             });
     
-            hookComponent(prototype, "connectedCallback", obj => {
-                if (listener) listener!.paused = false;
+            hookComponent(prototype, "connectedCallback", o => {
+                if (o === obj && listener) listener!.paused = false;
             });
 
             try {

@@ -12,7 +12,7 @@
     "stencil": "../../node_modules/.bin/stencil"
   },
   "dependencies": {
-    "stencil-quantum": "^1.0.0-alpha.14"
+    "stencil-quantum": "../quantum"
   },
   "license": "MIT"
 }

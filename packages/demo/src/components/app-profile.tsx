@@ -22,7 +22,7 @@ export class AppProfile
         <section class="section">
           <div class="container">
             <h1 class="title">
-              Hello <quantum-consumer name="personToGreet"></quantum-consumer>!
+              Hello <quantum-display bind={demo.get("personToGreet")} name="" namespace="" debug={true}></quantum-display>!
             </h1>
             <p>
               My name is {normalize(this.match.params.name)}. My name was passed in
@@ -36,3 +36,4 @@ export class AppProfile
     }
   }
 }
+ 
