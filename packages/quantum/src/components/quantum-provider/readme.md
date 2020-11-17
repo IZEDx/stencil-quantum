@@ -7,10 +7,13 @@
 
 ## Properties
 
-| Property            | Attribute | Description | Type     | Default     |
-| ------------------- | --------- | ----------- | -------- | ----------- |
-| `name` _(required)_ | `name`    |             | `string` | `undefined` |
-| `value`             | `value`   |             | `any`    | `undefined` |
+| Property    | Attribute   | Description | Type                                | Default     |
+| ----------- | ----------- | ----------- | ----------------------------------- | ----------- |
+| `bind`      | --          |             | `QuantumKey<any, any> \| undefined` | `undefined` |
+| `debug`     | `debug`     |             | `boolean \| undefined`              | `undefined` |
+| `name`      | `name`      |             | `string \| undefined`               | `undefined` |
+| `namespace` | `namespace` |             | `string \| undefined`               | `undefined` |
+| `value`     | `value`     |             | `any`                               | `undefined` |
 
 
 ----------------------------------------------
