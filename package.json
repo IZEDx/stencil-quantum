@@ -23,7 +23,6 @@
     "jest-cli": "24.9.0",
     "lerna": "latest",
     "puppeteer": "2.0.0",
-    "restyped-axios": "^2.0.0",
     "typescript": "^4.0.3",
     "np": "latest"
   }
