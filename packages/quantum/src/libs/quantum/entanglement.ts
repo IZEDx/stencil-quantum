@@ -1,6 +1,7 @@
 import { QuantumSchema } from "./schema";
 import { QuantumKeys } from "./keys";
 import { ReactDecorator, React, Observe, Context, Provide, ProvideDecorator, ContextDecorator, ObserveDecorator } from "../context";
+import { Implement, ImplementDecorator } from "../context/implement";
 
 export interface EntangleOptions 
 {
@@ -52,5 +53,15 @@ export class Entanglement<T extends QuantumSchema>
     React<K extends keyof QuantumKeys<T>, Q extends Entanglement<any>, QK extends keyof Q["keys"]>(key: K, target: Q, targetKey: QK): ReactDecorator<Entanglement<T>, K, Q, QK>
     {
         return React(this as Entanglement<T>, key, target, targetKey);
+    }
+
+    Implement<K extends keyof QuantumKeys<T>>(key: K): ImplementDecorator<Entanglement<T>, K>
+    {
+        return Implement(this as Entanglement<T>, key);
+    }
+
+    Action<K extends keyof QuantumKeys<T>>(key: K): ContextDecorator<Entanglement<T>, K>
+    {
+        return Context(this as Entanglement<T>, key);
     }
 }

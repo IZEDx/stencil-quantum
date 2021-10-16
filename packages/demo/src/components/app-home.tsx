@@ -1,6 +1,5 @@
 import { Component, h, Element } from '@stencil/core';
-import { Get, Entanglement, qt } from 'stencil-quantum';
-import { APISchema } from '../api.schema';
+import { Entanglement, qt } from 'stencil-quantum';
 import { demo } from '../context/demo';
 
 const q = new Entanglement(
@@ -23,7 +22,7 @@ export class AppHome {
     return { id: name.toLowerCase() + ".json" }
   }
   
-  @Get<APISchema>({ url: "/user/:id",  axios: "api",  params: "userParams" }) user = { name: "Guest" };
+  user = { name: "Guest" };
 
   render() {
     return (

@@ -79,7 +79,6 @@ declare namespace LocalJSX {
     interface AppHome {
     }
     interface AppNav {
-        "onChangeName"?: (event: CustomEvent<string>) => void;
     }
     interface AppProfile {
         "match"?: MatchResults;

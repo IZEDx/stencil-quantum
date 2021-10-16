@@ -1,4 +1,4 @@
-import { Component, h, State, Listen, Event, EventEmitter, Element } from '@stencil/core';
+import { Component, h, State, Listen, Element } from '@stencil/core';
 import { demo } from '../context/demo';
 
 
@@ -8,7 +8,7 @@ import { demo } from '../context/demo';
 export class AppNav 
 {
     @Element() el!: HTMLAppNavElement;    
-    @Event() changeName!: EventEmitter<string>;
+    @demo.Action("changeName") changeName!: (name: string) => Promise<void>;
     @demo.Context("personToGreet") personToGreet: string;
 
     @State() expandNav = false;
@@ -59,7 +59,8 @@ export class AppNav
                             <div class="navbar-item">
                                 <input class="input" type="text" placeholder="Your Name" value={this.personToGreet} onChange={e => {
                                     console.log("changing personToGreet: ", e.target["value"]);
-                                    this.personToGreet = e.target["value"]
+                                    //this.personToGreet = e.target["value"]
+                                    this.changeName(e.target["value"]);
                                 }} />
                             </div>
                             <div class={{"navbar-item": true, "has-dropdown": true, "is-active": this.showThemer}}>

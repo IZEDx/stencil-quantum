@@ -25,6 +25,12 @@ export class AppRoot
 	demoNameIndex = -1;
 	@demo.Provide("api") api = axios.create<APISchema>({baseURL: "/assets/api/"});
 
+	@demo.Implement("changeName")
+	async changeName(name: string)
+	{
+		this.personToGreet = name;
+	}
+
 	componentDidLoad() 
 	{
 		console.log(this.api);
