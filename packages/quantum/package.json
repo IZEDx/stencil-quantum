@@ -1,6 +1,6 @@
 {
   "name": "stencil-quantum",
-  "version": "1.0.0-alpha.17",
+  "version": "0.7.0",
   "description": "Experience the quantum realm of stencil.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
