@@ -13,13 +13,14 @@ export interface EntangleOptions
 export class Entanglement<T extends QuantumSchema>
 {
     public keys: QuantumKeys<T>;
+    public static uid = 0;
 
     constructor(schema: T, opts?: EntangleOptions)
     {
         this.keys = Object.entries(schema)
             .map(([key, value]) => ({
                 name: key,
-                namespace: opts?.namespace,
+                namespace: opts?.namespace ?? `$${Entanglement.uid++}`,
                 default: value.default,
                 mutable: value.mutable,
                 debug: value.debug,
