@@ -8,7 +8,7 @@ import { QuantumKey, throwQuantum } from '../../libs';
 export class QuantumConsumer {
 
     @Element() el!: HTMLQuantumConsumerElement;
-    @Event() value!: EventEmitter<any>;
+    @Event() update!: EventEmitter<{value: any, provider: Provider<any>}>;
     
     @Prop() bind!: QuantumKey<any, any>;
     @Prop({reflect: true, mutable: true}) name?: string;
@@ -24,7 +24,10 @@ export class QuantumConsumer {
             const provider = Provider.find(this.el, this.name, this.namespace, this.debug);
             provider.listen(val => {
                 try {
-                    this.value.emit(val);
+                    this.update.emit({
+                        value: val,
+                        provider
+                    });
                 } catch(err) {
                     throwQuantum(this.el, err);
                 }

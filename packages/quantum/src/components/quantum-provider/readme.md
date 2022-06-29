@@ -16,6 +16,13 @@
 | `value`     | `value`     |             | `any`                               | `undefined` |
 
 
+## Events
+
+| Event    | Description | Type                                                    |
+| -------- | ----------- | ------------------------------------------------------- |
+| `update` |             | `CustomEvent<{ value: any; provider: Provider<any>; }>` |
+
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

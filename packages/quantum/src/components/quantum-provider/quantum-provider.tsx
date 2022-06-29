@@ -1,4 +1,4 @@
-import { Component, h, Prop, Watch, Element } from '@stencil/core';
+import { Component, h, Prop, Watch, Element, Event, EventEmitter } from '@stencil/core';
 import { Provider } from '../../libs/provider';
 import { QuantumKey, throwQuantum } from '../../libs';
 
@@ -8,6 +8,7 @@ import { QuantumKey, throwQuantum } from '../../libs';
 export class QuantumProvider 
 {
     @Element() el!: HTMLQuantumProviderElement;
+    @Event() update!: EventEmitter<{value: any, provider: Provider<any>}>;
 
     @Prop() bind?: QuantumKey<any, any>;
     @Prop({reflect: true, mutable: true}) name?: string;
@@ -24,6 +25,17 @@ export class QuantumProvider
             this.namespace = this.bind?.namespace ?? this.namespace;
             this.debug = this.bind?.debug || this.debug;
             this.provider = Provider.create(this.el, this.name, this.value, this.namespace, this.debug);
+
+            this.provider.listen(val => {
+                try {
+                    this.update.emit({
+                        value: val,
+                        provider: this.provider
+                    });
+                } catch(err) {
+                    throwQuantum(this.el, err);
+                }
+            }, true);
         } catch(err) {
             throwQuantum(this.el, err);
         }

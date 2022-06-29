@@ -19,4 +19,4 @@ type ResolveQuantumType<T extends QuantumSchema, K extends keyof T> =
     : never
 
 export type ContextType<T extends Entanglement<any>, K extends keyof T["keys"]> = ResolveQuantumKey<T["keys"][K], T>;
-type ResolveQuantumKey<K, C extends Entanglement<any>> = K extends QuantumKey<infer T, C> ? T : never;
+export type ResolveQuantumKey<K, C extends Entanglement<any>> = K extends QuantumKey<infer T, C> ? T : never;

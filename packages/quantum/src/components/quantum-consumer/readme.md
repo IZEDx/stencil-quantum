@@ -17,9 +17,9 @@
 
 ## Events
 
-| Event   | Description | Type               |
-| ------- | ----------- | ------------------ |
-| `value` |             | `CustomEvent<any>` |
+| Event    | Description | Type                                                    |
+| -------- | ----------- | ------------------------------------------------------- |
+| `update` |             | `CustomEvent<{ value: any; provider: Provider<any>; }>` |
 
 
 ----------------------------------------------
