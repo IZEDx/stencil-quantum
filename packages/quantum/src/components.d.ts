@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { QuantumKey } from "./libs";
+import { Provider } from "./libs/provider";
 export namespace Components {
     interface QuantumConsumer {
         "bind": QuantumKey<any, any>;
@@ -68,7 +69,7 @@ declare namespace LocalJSX {
         "debug"?: boolean;
         "name"?: string;
         "namespace"?: string;
-        "onValue"?: (event: CustomEvent<any>) => void;
+        "onUpdate"?: (event: CustomEvent<{value: any, provider: Provider<any>}>) => void;
     }
     interface QuantumDisplay {
         "bind": QuantumKey<any, any>;
@@ -84,6 +85,7 @@ declare namespace LocalJSX {
         "debug"?: boolean;
         "name"?: string;
         "namespace"?: string;
+        "onUpdate"?: (event: CustomEvent<{value: any, provider: Provider<any>}>) => void;
         "value"?: any;
     }
     interface IntrinsicElements {
